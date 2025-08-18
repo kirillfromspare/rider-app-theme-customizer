@@ -818,26 +818,56 @@
             }
             
             /**
-             * Checks if a color is very dark and falls within the blue-purple range
-             * @param {string} color - Hex color to check
-             * @returns {boolean} - True if the color should be excluded
+             * Calculates the reference contrast ratio using the original default blue color
+             * This serves as the maximum darkness threshold for any selected color
+             * @returns {number} - The reference contrast ratio
              */
-            shouldExcludeDarkBluePurple(color) {
-                const chroma_color = chroma(color);
-                const hsl = chroma_color.hsl();
-                const [hue, saturation, lightness] = hsl;
+            calculateReferenceContrastRatio() {
+                // Use the original default blue color
+                const defaultBlue = '#0362FF';
                 
-                // Define blue-purple hue range (240° to 300° in HSL)
-                // Blue is around 240°, Purple is around 300°
-                const isInBluePurpleRange = (hue >= 220 && hue <= 320) || isNaN(hue); // Handle achromatic colors
+                // Calculate what the background secondary would be for this default color
+                const lightBgPrimary = '#ffffff';
+                const referenceSecondary = this.createAccessibleSecondary(defaultBlue, lightBgPrimary);
                 
-                // Consider colors "very dark" if lightness is below 30%
-                const isVeryDark = lightness < 0.3;
+                // Calculate contrast ratio between default blue and its derived background
+                const referenceRatio = chroma.contrast(defaultBlue, referenceSecondary);
                 
-                // Also check if saturation is high enough to be in the problematic range
-                const hasEnoughSaturation = saturation > 0.3;
+                return referenceRatio;
+            }
+            
+            /**
+             * Ensures a color doesn't exceed the reference darkness by checking contrast ratio
+             * @param {string} color - Color to check/adjust
+             * @returns {string} - Adjusted color that doesn't exceed reference darkness
+             */
+            limitColorDarkness(color) {
+                // Get the reference contrast ratio from the default blue
+                const referenceRatio = this.calculateReferenceContrastRatio();
                 
-                return isInBluePurpleRange && isVeryDark && hasEnoughSaturation;
+                const lightBgPrimary = '#ffffff';
+                const testSecondary = this.createAccessibleSecondary(color, lightBgPrimary);
+                const currentRatio = chroma.contrast(color, testSecondary);
+                
+                // If the current color creates a higher contrast ratio (meaning it's darker)
+                // than our reference, we need to lighten it
+                if (currentRatio > referenceRatio) {
+                    let adjustedColor = chroma(color);
+                    
+                    // Gradually lighten the color until it matches the reference ratio
+                    for (let i = 0; i < 100; i++) {
+                        adjustedColor = adjustedColor.brighten(0.05);
+                        const newTestSecondary = this.createAccessibleSecondary(adjustedColor.hex(), lightBgPrimary);
+                        const newRatio = chroma.contrast(adjustedColor, newTestSecondary);
+                        
+                        // Stop when we reach or go below the reference ratio
+                        if (newRatio <= referenceRatio) {
+                            return adjustedColor.hex();
+                        }
+                    }
+                }
+                
+                return color;
             }
             
             getColorFromGradientPosition(position) {
@@ -874,13 +904,8 @@
                 
                 let color = `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
                 
-                // Check if this color should be excluded and adjust if necessary
-                if (this.shouldExcludeDarkBluePurple(color)) {
-                    // Lighten the color to make it more acceptable
-                    const chromaColor = chroma(color);
-                    const adjustedColor = chromaColor.set('hsl.l', 0.45); // Set lightness to 45%
-                    color = adjustedColor.hex();
-                }
+                // Apply contrast ratio-based darkness control
+                color = this.limitColorDarkness(color);
                 
                 return color;
             }
