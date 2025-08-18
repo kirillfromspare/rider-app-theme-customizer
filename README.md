@@ -18,7 +18,7 @@ A web-based tool for customizing app themes with real-time color palette generat
 
 ## Live Demo
 
-Visit the live demo: [https://your-username.github.io/theme-customizer](https://your-username.github.io/theme-customizer)
+Visit the live demo: [https://kirillfromspare.github.io/rider-app-theme-customizer](https://kirillfromspare.github.io/rider-app-theme-customizer)
 
 ## Color Palette Generation
 
