@@ -833,7 +833,11 @@
                 // Calculate contrast ratio between default blue and its derived background
                 const referenceRatio = chroma.contrast(defaultBlue, referenceSecondary);
                 
-                return referenceRatio;
+                // Lower the darkness threshold by reducing the reference ratio by 20%
+                // This allows lighter colors to be selected
+                const adjustedRatio = referenceRatio * 0.8;
+                
+                return adjustedRatio;
             }
             
             /**
