@@ -18,7 +18,13 @@ A web-based tool for customizing app themes with real-time color palette generat
 
 ## Live Demo
 
-Visit the live demo: [https://kirillfromspare.github.io/rider-app-theme-customizer](https://kirillfromspare.github.io/rider-app-theme-customizer)
+🚧 **GitHub Pages is being set up** - Live demo will be available soon at: https://kirillfromspare.github.io/rider-app-theme-customizer
+
+For now, you can run the app locally:
+```bash
+python3 -m http.server 8000
+# Then open http://localhost:8000
+```
 
 ## Color Palette Generation
 
