@@ -817,6 +817,29 @@
                 this.toggleResetButton();
             }
             
+            /**
+             * Checks if a color is very dark and falls within the blue-purple range
+             * @param {string} color - Hex color to check
+             * @returns {boolean} - True if the color should be excluded
+             */
+            shouldExcludeDarkBluePurple(color) {
+                const chroma_color = chroma(color);
+                const hsl = chroma_color.hsl();
+                const [hue, saturation, lightness] = hsl;
+                
+                // Define blue-purple hue range (240° to 300° in HSL)
+                // Blue is around 240°, Purple is around 300°
+                const isInBluePurpleRange = (hue >= 220 && hue <= 320) || isNaN(hue); // Handle achromatic colors
+                
+                // Consider colors "very dark" if lightness is below 30%
+                const isVeryDark = lightness < 0.3;
+                
+                // Also check if saturation is high enough to be in the problematic range
+                const hasEnoughSaturation = saturation > 0.3;
+                
+                return isInBluePurpleRange && isVeryDark && hasEnoughSaturation;
+            }
+            
             getColorFromGradientPosition(position) {
                 // Define the gradient stops
                 const stops = [
@@ -849,7 +872,17 @@
                 const g = Math.round(startStop.color[1] + (endStop.color[1] - startStop.color[1]) * ratio);
                 const b = Math.round(startStop.color[2] + (endStop.color[2] - startStop.color[2]) * ratio);
                 
-                return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+                let color = `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+                
+                // Check if this color should be excluded and adjust if necessary
+                if (this.shouldExcludeDarkBluePurple(color)) {
+                    // Lighten the color to make it more acceptable
+                    const chromaColor = chroma(color);
+                    const adjustedColor = chromaColor.set('hsl.l', 0.45); // Set lightness to 45%
+                    color = adjustedColor.hex();
+                }
+                
+                return color;
             }
             
             toggleResetButton() {
