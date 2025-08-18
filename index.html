@@ -302,6 +302,23 @@
             background: rgba(220, 53, 69, 0.1);
         }
 
+        /* Tertiary Button */
+        .btn-tertiary {
+            background: none;
+            color: var(--accent-primary);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-tertiary:hover {
+            background: var(--accent-low-contrast);
+        }
+
         /* Input Fields */
         .input-group {
             display: flex;
@@ -432,9 +449,13 @@
 
         /* Stepper */
         .stepper {
-            display: flex;
+            display: inline-flex;
+            justify-content: center;
             align-items: center;
-            gap: 12px;
+            gap: -8px;
+            border-radius: var(--border-radius-2xl, 32px);
+            background: var(--bg-secondary, #F5F6FA);
+            padding: 4px;
         }
 
         .stepper-btn {
@@ -562,6 +583,7 @@
                         <div class="ui-row">
                             <button class="btn-primary">Label</button>
                             <button class="btn-secondary">Label</button>
+                            <button class="btn-tertiary">Label</button>
                         </div>
                         <div class="ui-row">
                             <button class="btn-danger-primary">Label</button>
@@ -580,8 +602,8 @@
                             </div>
                             <div class="input-group">
                                 <label class="input-label">Label</label>
-                                <input type="text" class="input-field" placeholder="Placeholder" value="" style="border-color: var(--accent-primary);">
-                                <span class="input-hint">Hint</span>
+                                <input type="text" class="input-field error" placeholder="Placeholder" value="Place">
+                                <span class="input-hint error">Something went wrong</span>
                             </div>
                         </div>
                     </div>
@@ -644,6 +666,7 @@
                         <div class="ui-row">
                             <button class="btn-primary">Label</button>
                             <button class="btn-secondary">Label</button>
+                            <button class="btn-tertiary">Label</button>
                         </div>
                         <div class="ui-row">
                             <button class="btn-danger-primary">Label</button>
@@ -662,8 +685,8 @@
                             </div>
                             <div class="input-group">
                                 <label class="input-label">Label</label>
-                                <input type="text" class="input-field" placeholder="Placeholder" value="" style="border-color: var(--accent-primary);">
-                                <span class="input-hint">Hint</span>
+                                <input type="text" class="input-field error" placeholder="Placeholder" value="Place">
+                                <span class="input-hint error">Something went wrong</span>
                             </div>
                         </div>
                     </div>
