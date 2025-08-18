@@ -186,43 +186,260 @@
             color: white;
         }
 
-        .color-swatches {
-            padding: 20px;
-        }
-
-        .light-theme .color-swatches {
-            background: #f8f9fa;
-        }
-
-        .dark-theme .color-swatches {
-            background: #2d2d2d;
-        }
-
-        .color-item {
+        .ui-preview {
+            padding: 30px;
             display: flex;
-            align-items: center;
-            margin-bottom: 12px;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .light-theme .ui-preview {
+            background: var(--bg-primary);
+        }
+
+        .dark-theme .ui-preview {
+            background: var(--bg-primary);
+        }
+
+        /* UI Components Styling */
+        .ui-section {
+            display: flex;
+            flex-direction: column;
             gap: 15px;
         }
 
-        .color-swatch {
-            width: 40px;
-            height: 40px;
-            border-radius: 4px;
-            border: 1px solid rgba(0, 0, 0, 0.1);
+        .ui-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
         }
 
-        .color-label {
+        /* Buttons */
+        .btn-primary {
+            background: var(--accent-primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
             font-size: 14px;
             font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
         }
 
-        .light-theme .color-label {
-            color: #333;
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
 
-        .dark-theme .color-label {
+        .btn-secondary {
+            background: var(--accent-low-contrast);
+            color: var(--accent-primary);
+            border: 1px solid var(--accent-primary);
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-secondary:hover {
+            background: var(--accent-primary);
             color: white;
+        }
+
+        /* Input Fields */
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            min-width: 200px;
+        }
+
+        .input-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--content-primary);
+        }
+
+        .input-field {
+            padding: 12px 16px;
+            border: 2px solid var(--content-secondary);
+            border-radius: 8px;
+            font-size: 14px;
+            background: var(--bg-secondary);
+            color: var(--content-primary);
+            transition: all 0.2s ease;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(var(--accent-primary-rgb), 0.1);
+        }
+
+        .input-field.error {
+            border-color: #dc3545;
+        }
+
+        .input-hint {
+            font-size: 12px;
+            color: var(--content-secondary);
+        }
+
+        .input-hint.error {
+            color: #dc3545;
+        }
+
+        /* Checkboxes and Radio Buttons */
+        .checkbox-group, .radio-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .checkbox, .radio {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--content-secondary);
+            background: var(--bg-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .checkbox {
+            border-radius: 4px;
+        }
+
+        .radio {
+            border-radius: 50%;
+        }
+
+        .checkbox.checked, .radio.checked {
+            background: var(--accent-primary);
+            border-color: var(--accent-primary);
+        }
+
+        .checkbox.checked::after {
+            content: '✓';
+            position: absolute;
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .radio.checked::after {
+            content: '';
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Toggle Switch */
+        .toggle-switch {
+            width: 50px;
+            height: 26px;
+            background: var(--content-secondary);
+            border-radius: 13px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-switch.active {
+            background: var(--accent-primary);
+        }
+
+        .toggle-handle {
+            width: 22px;
+            height: 22px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .toggle-switch.active .toggle-handle {
+            left: 26px;
+        }
+
+        /* Stepper */
+        .stepper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .stepper-btn {
+            width: 32px;
+            height: 32px;
+            background: var(--accent-primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .stepper-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .stepper-value {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--content-primary);
+            min-width: 30px;
+            text-align: center;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 4px;
+            gap: 4px;
+        }
+
+        .tab {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--content-secondary);
+        }
+
+        .tab.active {
+            background: white;
+            color: var(--accent-primary);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .dark-theme .tab.active {
+            background: var(--bg-primary);
         }
 
         .save-btn {
@@ -284,62 +501,156 @@
         </div>
 
         <div class="themes-container">
-            <div class="theme-panel light-theme">
+            <div class="theme-panel light-theme" id="lightTheme">
                 <div class="theme-header">Light Theme</div>
-                <div class="color-swatches" id="lightTheme">
-                    <div class="color-item">
-                        <div class="color-swatch" id="lightAccentPrimary"></div>
-                        <div class="color-label">AccentPrimary</div>
+                <div class="ui-preview">
+                    <!-- Buttons Section -->
+                    <div class="ui-section">
+                        <div class="ui-row">
+                            <button class="btn-primary">Label</button>
+                            <button class="btn-secondary">Label</button>
+                        </div>
                     </div>
-                    <div class="color-item">
-                        <div class="color-swatch" id="lightAccentLowContrast"></div>
-                        <div class="color-label">AccentLowContrast</div>
+                    
+                    <!-- Input Fields Section -->
+                    <div class="ui-section">
+                        <div class="ui-row">
+                            <div class="input-group">
+                                <label class="input-label">Label</label>
+                                <input type="text" class="input-field" placeholder="Placeholder" value="">
+                                <span class="input-hint">Hint</span>
+                            </div>
+                            <div class="input-group">
+                                <label class="input-label">Label</label>
+                                <input type="text" class="input-field" placeholder="Placeholder" value="" style="border-color: var(--accent-primary);">
+                                <span class="input-hint">Hint</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="color-item">
-                        <div class="color-swatch" id="lightBackgroundPrimary"></div>
-                        <div class="color-label">BackgroundPrimary</div>
+                    
+                    <!-- Controls Section -->
+                    <div class="ui-section">
+                        <div class="ui-row">
+                            <div class="checkbox-group">
+                                <div class="checkbox"></div>
+                                <span class="input-label">Label</span>
+                            </div>
+                            <div class="checkbox-group">
+                                <div class="checkbox checked"></div>
+                                <span class="input-label">Label</span>
+                            </div>
+                            <div class="radio-group">
+                                <div class="radio"></div>
+                                <span class="input-label">Label</span>
+                            </div>
+                            <div class="radio-group">
+                                <div class="radio checked"></div>
+                                <span class="input-label">Label</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="color-item">
-                        <div class="color-swatch" id="lightBackgroundSecondary"></div>
-                        <div class="color-label">BackgroundSecondary</div>
+                    
+                    <!-- Toggle and Stepper Section -->
+                    <div class="ui-section">
+                        <div class="ui-row">
+                            <div class="toggle-switch">
+                                <div class="toggle-handle"></div>
+                            </div>
+                            <div class="toggle-switch active">
+                                <div class="toggle-handle"></div>
+                            </div>
+                            <div class="stepper">
+                                <button class="stepper-btn">-</button>
+                                <span class="stepper-value">0</span>
+                                <button class="stepper-btn">+</button>
+                                <span class="input-label">Label</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="color-item">
-                        <div class="color-swatch" id="lightContentPrimary"></div>
-                        <div class="color-label">ContentPrimary</div>
-                    </div>
-                    <div class="color-item">
-                        <div class="color-swatch" id="lightContentSecondary"></div>
-                        <div class="color-label">ContentSecondary</div>
+                    
+                    <!-- Tabs Section -->
+                    <div class="ui-section">
+                        <div class="tabs">
+                            <div class="tab active">Label</div>
+                            <div class="tab">Label</div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="theme-panel dark-theme">
+            <div class="theme-panel dark-theme" id="darkTheme">
                 <div class="theme-header">Dark Theme</div>
-                <div class="color-swatches" id="darkTheme">
-                    <div class="color-item">
-                        <div class="color-swatch" id="darkAccentPrimary"></div>
-                        <div class="color-label">AccentPrimary</div>
+                <div class="ui-preview">
+                    <!-- Buttons Section -->
+                    <div class="ui-section">
+                        <div class="ui-row">
+                            <button class="btn-primary">Label</button>
+                            <button class="btn-secondary">Label</button>
+                        </div>
                     </div>
-                    <div class="color-item">
-                        <div class="color-swatch" id="darkAccentLowContrast"></div>
-                        <div class="color-label">AccentLowContrast</div>
+                    
+                    <!-- Input Fields Section -->
+                    <div class="ui-section">
+                        <div class="ui-row">
+                            <div class="input-group">
+                                <label class="input-label">Label</label>
+                                <input type="text" class="input-field" placeholder="Placeholder" value="">
+                                <span class="input-hint">Hint</span>
+                            </div>
+                            <div class="input-group">
+                                <label class="input-label">Label</label>
+                                <input type="text" class="input-field" placeholder="Placeholder" value="" style="border-color: var(--accent-primary);">
+                                <span class="input-hint">Hint</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="color-item">
-                        <div class="color-swatch" id="darkBackgroundPrimary"></div>
-                        <div class="color-label">BackgroundPrimary</div>
+                    
+                    <!-- Controls Section -->
+                    <div class="ui-section">
+                        <div class="ui-row">
+                            <div class="checkbox-group">
+                                <div class="checkbox"></div>
+                                <span class="input-label">Label</span>
+                            </div>
+                            <div class="checkbox-group">
+                                <div class="checkbox checked"></div>
+                                <span class="input-label">Label</span>
+                            </div>
+                            <div class="radio-group">
+                                <div class="radio"></div>
+                                <span class="input-label">Label</span>
+                            </div>
+                            <div class="radio-group">
+                                <div class="radio checked"></div>
+                                <span class="input-label">Label</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="color-item">
-                        <div class="color-swatch" id="darkBackgroundSecondary"></div>
-                        <div class="color-label">BackgroundSecondary</div>
+                    
+                    <!-- Toggle and Stepper Section -->
+                    <div class="ui-section">
+                        <div class="ui-row">
+                            <div class="toggle-switch">
+                                <div class="toggle-handle"></div>
+                            </div>
+                            <div class="toggle-switch active">
+                                <div class="toggle-handle"></div>
+                            </div>
+                            <div class="stepper">
+                                <button class="stepper-btn">-</button>
+                                <span class="stepper-value">0</span>
+                                <button class="stepper-btn">+</button>
+                                <span class="input-label">Label</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="color-item">
-                        <div class="color-swatch" id="darkContentPrimary"></div>
-                        <div class="color-label">ContentPrimary</div>
-                    </div>
-                    <div class="color-item">
-                        <div class="color-swatch" id="darkContentSecondary"></div>
-                        <div class="color-label">ContentSecondary</div>
+                    
+                    <!-- Tabs Section -->
+                    <div class="ui-section">
+                        <div class="tabs">
+                            <div class="tab active">Label</div>
+                            <div class="tab">Label</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -557,21 +868,33 @@
             updateThemes(color) {
                 const palette = this.generatePalette(color);
                 
-                // Update light theme
-                document.getElementById('lightAccentPrimary').style.backgroundColor = palette.light.accentPrimary;
-                document.getElementById('lightAccentLowContrast').style.backgroundColor = palette.light.accentLowContrast;
-                document.getElementById('lightBackgroundPrimary').style.backgroundColor = palette.light.backgroundPrimary;
-                document.getElementById('lightBackgroundSecondary').style.backgroundColor = palette.light.backgroundSecondary;
-                document.getElementById('lightContentPrimary').style.backgroundColor = palette.light.contentPrimary;
-                document.getElementById('lightContentSecondary').style.backgroundColor = palette.light.contentSecondary;
+                // Helper function to convert hex to RGB for CSS variables
+                const hexToRgb = (hex) => {
+                    const r = parseInt(hex.slice(1, 3), 16);
+                    const g = parseInt(hex.slice(3, 5), 16);
+                    const b = parseInt(hex.slice(5, 7), 16);
+                    return `${r}, ${g}, ${b}`;
+                };
                 
-                // Update dark theme
-                document.getElementById('darkAccentPrimary').style.backgroundColor = palette.dark.accentPrimary;
-                document.getElementById('darkAccentLowContrast').style.backgroundColor = palette.dark.accentLowContrast;
-                document.getElementById('darkBackgroundPrimary').style.backgroundColor = palette.dark.backgroundPrimary;
-                document.getElementById('darkBackgroundSecondary').style.backgroundColor = palette.dark.backgroundSecondary;
-                document.getElementById('darkContentPrimary').style.backgroundColor = palette.dark.contentPrimary;
-                document.getElementById('darkContentSecondary').style.backgroundColor = palette.dark.contentSecondary;
+                // Update light theme CSS variables
+                const lightTheme = document.getElementById('lightTheme');
+                lightTheme.style.setProperty('--accent-primary', palette.light.accentPrimary);
+                lightTheme.style.setProperty('--accent-primary-rgb', hexToRgb(palette.light.accentPrimary));
+                lightTheme.style.setProperty('--accent-low-contrast', palette.light.accentLowContrast);
+                lightTheme.style.setProperty('--bg-primary', palette.light.backgroundPrimary);
+                lightTheme.style.setProperty('--bg-secondary', palette.light.backgroundSecondary);
+                lightTheme.style.setProperty('--content-primary', palette.light.contentPrimary);
+                lightTheme.style.setProperty('--content-secondary', palette.light.contentSecondary);
+                
+                // Update dark theme CSS variables
+                const darkTheme = document.getElementById('darkTheme');
+                darkTheme.style.setProperty('--accent-primary', palette.dark.accentPrimary);
+                darkTheme.style.setProperty('--accent-primary-rgb', hexToRgb(palette.dark.accentPrimary));
+                darkTheme.style.setProperty('--accent-low-contrast', palette.dark.accentLowContrast);
+                darkTheme.style.setProperty('--bg-primary', palette.dark.backgroundPrimary);
+                darkTheme.style.setProperty('--bg-secondary', palette.dark.backgroundSecondary);
+                darkTheme.style.setProperty('--content-primary', palette.dark.contentPrimary);
+                darkTheme.style.setProperty('--content-secondary', palette.dark.contentSecondary);
             }
         }
         
