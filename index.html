@@ -445,7 +445,7 @@
         .save-btn {
             display: block;
             margin: 40px auto 0;
-            background: #007AFF;
+            background: var(--accent-primary, #007AFF);
             color: white;
             border: none;
             padding: 12px 32px;
@@ -453,11 +453,12 @@
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: all 0.3s ease;
         }
 
         .save-btn:hover {
-            background: #0056b3;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
 
         @media (max-width: 768px) {
@@ -847,20 +848,42 @@
                 
                 return {
                     light: {
+                        // AccentPrimary: Use base color as-is
                         accentPrimary: baseColor,
-                        accentLowContrast: this.hslToHex(h, Math.max(10, s - 40), Math.min(95, l + 40)),
-                        backgroundPrimary: this.hslToHex(h, Math.max(5, s - 80), 96),
-                        backgroundSecondary: this.hslToHex(h, Math.max(5, s - 80), 98),
-                        contentPrimary: this.hslToHex(h, Math.min(100, s + 20), 15),
-                        contentSecondary: this.hslToHex(h, Math.max(10, s - 20), 35)
+                        
+                        // AccentLowContrast: Highly desaturated, very light
+                        accentLowContrast: this.hslToHex(h, Math.min(20, s * 0.3), 88),
+                        
+                        // BackgroundPrimary: Extremely subtle tint, very light
+                        backgroundPrimary: this.hslToHex(h, Math.min(5, s * 0.1), 97),
+                        
+                        // BackgroundSecondary: Even lighter, nearly white
+                        backgroundSecondary: this.hslToHex(h, Math.min(3, s * 0.05), 99),
+                        
+                        // ContentPrimary: Dark with subtle hue tint for readability
+                        contentPrimary: this.hslToHex(h, Math.min(30, s * 0.4), 12),
+                        
+                        // ContentSecondary: Medium gray with subtle hue tint
+                        contentSecondary: this.hslToHex(h, Math.min(15, s * 0.2), 55)
                     },
                     dark: {
-                        accentPrimary: this.hslToHex(h, s, Math.min(80, l + 20)),
-                        accentLowContrast: this.hslToHex(h, Math.max(20, s - 30), Math.max(25, l - 20)),
-                        backgroundPrimary: this.hslToHex(h, Math.max(10, s - 40), 8),
-                        backgroundSecondary: this.hslToHex(h, Math.max(10, s - 40), 12),
-                        contentPrimary: this.hslToHex(h, Math.max(5, s - 80), 95),
-                        contentSecondary: this.hslToHex(h, Math.max(10, s - 60), 65)
+                        // AccentPrimary: Brighter, more vibrant version
+                        accentPrimary: this.hslToHex(h, Math.min(100, s * 1.1), Math.min(85, l + 15)),
+                        
+                        // AccentLowContrast: Darker, muted version
+                        accentLowContrast: this.hslToHex(h, Math.max(40, s * 0.7), Math.max(25, l * 0.6)),
+                        
+                        // BackgroundPrimary: Very dark with subtle hue tint
+                        backgroundPrimary: this.hslToHex(h, Math.min(8, s * 0.15), 10),
+                        
+                        // BackgroundSecondary: Slightly lighter dark
+                        backgroundSecondary: this.hslToHex(h, Math.min(6, s * 0.1), 16),
+                        
+                        // ContentPrimary: Near white for high contrast
+                        contentPrimary: this.hslToHex(h, Math.min(5, s * 0.05), 96),
+                        
+                        // ContentSecondary: Light gray with subtle hue tint  
+                        contentSecondary: this.hslToHex(h, Math.min(10, s * 0.1), 75)
                     }
                 };
             }
@@ -895,6 +918,9 @@
                 darkTheme.style.setProperty('--bg-secondary', palette.dark.backgroundSecondary);
                 darkTheme.style.setProperty('--content-primary', palette.dark.contentPrimary);
                 darkTheme.style.setProperty('--content-secondary', palette.dark.contentSecondary);
+                
+                // Update root CSS variables for Save button (use light theme colors for consistency)
+                document.documentElement.style.setProperty('--accent-primary', palette.light.accentPrimary);
             }
         }
         
