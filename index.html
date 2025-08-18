@@ -236,7 +236,7 @@
         .btn-secondary {
             background: var(--accent-low-contrast);
             color: var(--accent-primary);
-            border: 1px solid var(--accent-primary);
+            border: none;
             padding: 12px 24px;
             border-radius: 8px;
             font-size: 14px;
@@ -248,6 +248,58 @@
         .btn-secondary:hover {
             background: var(--accent-primary);
             color: white;
+        }
+
+        /* Danger Buttons */
+        .btn-danger-primary {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-danger-primary:hover {
+            background: #c82333;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+        }
+
+        .btn-danger-secondary {
+            background: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-danger-secondary:hover {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger-text {
+            background: none;
+            color: #dc3545;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-danger-text:hover {
+            background: rgba(220, 53, 69, 0.1);
         }
 
         /* Input Fields */
@@ -511,6 +563,11 @@
                             <button class="btn-primary">Label</button>
                             <button class="btn-secondary">Label</button>
                         </div>
+                        <div class="ui-row">
+                            <button class="btn-danger-primary">Label</button>
+                            <button class="btn-danger-secondary">Label</button>
+                            <button class="btn-danger-text">Label</button>
+                        </div>
                     </div>
                     
                     <!-- Input Fields Section -->
@@ -587,6 +644,11 @@
                         <div class="ui-row">
                             <button class="btn-primary">Label</button>
                             <button class="btn-secondary">Label</button>
+                        </div>
+                        <div class="ui-row">
+                            <button class="btn-danger-primary">Label</button>
+                            <button class="btn-danger-secondary">Label</button>
+                            <button class="btn-danger-text">Label</button>
                         </div>
                     </div>
                     
