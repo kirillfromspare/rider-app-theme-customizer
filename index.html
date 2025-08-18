@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rider App Theme Customization</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f5f5;
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .customization-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 50px;
+            gap: 60px;
+        }
+
+        .logo-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+        }
+
+        .logo-section h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .service-logo {
+            width: 80px;
+            height: 80px;
+            background: #333;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .replace-btn {
+            background: none;
+            border: none;
+            color: #666;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .replace-btn:hover {
+            color: #333;
+        }
+
+        .color-section {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .color-section h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .color-picker-container {
+            position: relative;
+            width: 400px;
+            height: 40px;
+            margin-bottom: 20px;
+        }
+
+        .color-gradient {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to right, 
+                #ff4136, #ff851b, #ffdc00, #2ecc40, 
+                #0074d9, #001f3f, #b10dc9, #f012be, #ff4136);
+            border-radius: 20px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .color-handle {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: white;
+            border: 3px solid #333;
+            border-radius: 50%;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: grab;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .color-handle:active {
+            cursor: grabbing;
+        }
+
+        .reset-btn {
+            background: #007AFF;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .reset-btn.show {
+            opacity: 1;
+        }
+
+        .reset-btn:hover {
+            background: #0056b3;
+        }
+
+        .themes-container {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+        }
+
+        .theme-panel {
+            flex: 1;
+            max-width: 400px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .theme-header {
+            padding: 20px;
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .light-theme .theme-header {
+            background: #f8f9fa;
+            color: #333;
+        }
+
+        .dark-theme .theme-header {
+            background: #2d2d2d;
+            color: white;
+        }
+
+        .color-swatches {
+            padding: 20px;
+        }
+
+        .light-theme .color-swatches {
+            background: #f8f9fa;
+        }
+
+        .dark-theme .color-swatches {
+            background: #2d2d2d;
+        }
+
+        .color-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            gap: 15px;
+        }
+
+        .color-swatch {
+            width: 40px;
+            height: 40px;
+            border-radius: 4px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .color-label {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .light-theme .color-label {
+            color: #333;
+        }
+
+        .dark-theme .color-label {
+            color: white;
+        }
+
+        .save-btn {
+            display: block;
+            margin: 40px auto 0;
+            background: #007AFF;
+            color: white;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .save-btn:hover {
+            background: #0056b3;
+        }
+
+        @media (max-width: 768px) {
+            .customization-section {
+                flex-direction: column;
+                gap: 30px;
+            }
+            
+            .themes-container {
+                flex-direction: column;
+            }
+            
+            .color-picker-container {
+                width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Rider App Theme Customization</h1>
+        
+        <div class="customization-section">
+            <div class="logo-section">
+                <h2>Service Logo</h2>
+                <div class="service-logo">M</div>
+                <button class="replace-btn">
+                    <span>✏️</span> Replace
+                </button>
+            </div>
+            
+            <div class="color-section">
+                <h2>UI Colours</h2>
+                <div class="color-picker-container">
+                    <div class="color-gradient" id="colorGradient">
+                        <div class="color-handle" id="colorHandle"></div>
+                    </div>
+                </div>
+                <button class="reset-btn" id="resetBtn">🔵 Reset to Default</button>
+            </div>
+        </div>
+
+        <div class="themes-container">
+            <div class="theme-panel light-theme">
+                <div class="theme-header">Light Theme</div>
+                <div class="color-swatches" id="lightTheme">
+                    <div class="color-item">
+                        <div class="color-swatch" id="lightAccentPrimary"></div>
+                        <div class="color-label">AccentPrimary</div>
+                    </div>
+                    <div class="color-item">
+                        <div class="color-swatch" id="lightAccentLowContrast"></div>
+                        <div class="color-label">AccentLowContrast</div>
+                    </div>
+                    <div class="color-item">
+                        <div class="color-swatch" id="lightBackgroundPrimary"></div>
+                        <div class="color-label">BackgroundPrimary</div>
+                    </div>
+                    <div class="color-item">
+                        <div class="color-swatch" id="lightBackgroundSecondary"></div>
+                        <div class="color-label">BackgroundSecondary</div>
+                    </div>
+                    <div class="color-item">
+                        <div class="color-swatch" id="lightContentPrimary"></div>
+                        <div class="color-label">ContentPrimary</div>
+                    </div>
+                    <div class="color-item">
+                        <div class="color-swatch" id="lightContentSecondary"></div>
+                        <div class="color-label">ContentSecondary</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="theme-panel dark-theme">
+                <div class="theme-header">Dark Theme</div>
+                <div class="color-swatches" id="darkTheme">
+                    <div class="color-item">
+                        <div class="color-swatch" id="darkAccentPrimary"></div>
+                        <div class="color-label">AccentPrimary</div>
+                    </div>
+                    <div class="color-item">
+                        <div class="color-swatch" id="darkAccentLowContrast"></div>
+                        <div class="color-label">AccentLowContrast</div>
+                    </div>
+                    <div class="color-item">
+                        <div class="color-swatch" id="darkBackgroundPrimary"></div>
+                        <div class="color-label">BackgroundPrimary</div>
+                    </div>
+                    <div class="color-item">
+                        <div class="color-swatch" id="darkBackgroundSecondary"></div>
+                        <div class="color-label">BackgroundSecondary</div>
+                    </div>
+                    <div class="color-item">
+                        <div class="color-swatch" id="darkContentPrimary"></div>
+                        <div class="color-label">ContentPrimary</div>
+                    </div>
+                    <div class="color-item">
+                        <div class="color-swatch" id="darkContentSecondary"></div>
+                        <div class="color-label">ContentSecondary</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button class="save-btn">Save Changes</button>
+    </div>
+
+    <script>
+        class ThemeCustomizer {
+            constructor() {
+                this.defaultColor = '#0362FF';
+                this.currentColor = this.defaultColor;
+                
+                this.colorGradient = document.getElementById('colorGradient');
+                this.colorHandle = document.getElementById('colorHandle');
+                this.resetBtn = document.getElementById('resetBtn');
+                
+                this.isDragging = false;
+                
+                this.init();
+            }
+            
+            init() {
+                this.updateThemes(this.currentColor);
+                this.setHandlePosition(0.62); // Position for #0362FF on the gradient
+                
+                this.colorGradient.addEventListener('click', this.handleGradientClick.bind(this));
+                this.colorHandle.addEventListener('mousedown', this.handleMouseDown.bind(this));
+                this.resetBtn.addEventListener('click', this.resetToDefault.bind(this));
+                
+                document.addEventListener('mousemove', this.handleMouseMove.bind(this));
+                document.addEventListener('mouseup', this.handleMouseUp.bind(this));
+            }
+            
+            handleGradientClick(e) {
+                if (e.target === this.colorHandle) return;
+                
+                const rect = this.colorGradient.getBoundingClientRect();
+                const position = (e.clientX - rect.left) / rect.width;
+                this.setHandlePosition(Math.max(0, Math.min(1, position)));
+                this.updateColorFromPosition(position);
+            }
+            
+            handleMouseDown(e) {
+                e.preventDefault();
+                this.isDragging = true;
+                this.colorHandle.style.cursor = 'grabbing';
+            }
+            
+            handleMouseMove(e) {
+                if (!this.isDragging) return;
+                
+                e.preventDefault();
+                const rect = this.colorGradient.getBoundingClientRect();
+                const position = (e.clientX - rect.left) / rect.width;
+                const clampedPosition = Math.max(0, Math.min(1, position));
+                
+                this.setHandlePosition(clampedPosition);
+                this.updateColorFromPosition(clampedPosition);
+            }
+            
+            handleMouseUp() {
+                if (this.isDragging) {
+                    this.isDragging = false;
+                    this.colorHandle.style.cursor = 'grab';
+                }
+            }
+            
+            setHandlePosition(position) {
+                const rect = this.colorGradient.getBoundingClientRect();
+                const handlePosition = position * rect.width - 15; // 15px is half of handle width
+                this.colorHandle.style.left = Math.max(-15, Math.min(rect.width - 15, handlePosition)) + 'px';
+            }
+            
+            updateColorFromPosition(position) {
+                const color = this.getColorFromGradientPosition(position);
+                this.currentColor = color;
+                this.updateThemes(color);
+                this.toggleResetButton();
+            }
+            
+            getColorFromGradientPosition(position) {
+                // Define the gradient stops
+                const stops = [
+                    { pos: 0, color: [255, 65, 54] },      // #ff4136
+                    { pos: 0.125, color: [255, 133, 27] }, // #ff851b
+                    { pos: 0.25, color: [255, 220, 0] },   // #ffdc00
+                    { pos: 0.375, color: [46, 204, 64] },  // #2ecc40
+                    { pos: 0.5, color: [0, 116, 217] },    // #0074d9
+                    { pos: 0.625, color: [0, 31, 63] },    // #001f3f
+                    { pos: 0.75, color: [177, 13, 201] },  // #b10dc9
+                    { pos: 0.875, color: [240, 18, 190] }, // #f012be
+                    { pos: 1, color: [255, 65, 54] }       // #ff4136
+                ];
+                
+                // Find the two stops to interpolate between
+                let startStop, endStop;
+                for (let i = 0; i < stops.length - 1; i++) {
+                    if (position >= stops[i].pos && position <= stops[i + 1].pos) {
+                        startStop = stops[i];
+                        endStop = stops[i + 1];
+                        break;
+                    }
+                }
+                
+                if (!startStop || !endStop) return this.defaultColor;
+                
+                // Interpolate between the two colors
+                const ratio = (position - startStop.pos) / (endStop.pos - startStop.pos);
+                const r = Math.round(startStop.color[0] + (endStop.color[0] - startStop.color[0]) * ratio);
+                const g = Math.round(startStop.color[1] + (endStop.color[1] - startStop.color[1]) * ratio);
+                const b = Math.round(startStop.color[2] + (endStop.color[2] - startStop.color[2]) * ratio);
+                
+                return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+            }
+            
+            toggleResetButton() {
+                if (this.currentColor.toLowerCase() !== this.defaultColor.toLowerCase()) {
+                    this.resetBtn.classList.add('show');
+                } else {
+                    this.resetBtn.classList.remove('show');
+                }
+            }
+            
+            resetToDefault() {
+                this.currentColor = this.defaultColor;
+                this.setHandlePosition(0.62); // Position for #0362FF
+                this.updateThemes(this.defaultColor);
+                this.resetBtn.classList.remove('show');
+            }
+            
+            hexToHsl(hex) {
+                const r = parseInt(hex.slice(1, 3), 16) / 255;
+                const g = parseInt(hex.slice(3, 5), 16) / 255;
+                const b = parseInt(hex.slice(5, 7), 16) / 255;
+                
+                const max = Math.max(r, g, b);
+                const min = Math.min(r, g, b);
+                let h, s, l = (max + min) / 2;
+                
+                if (max === min) {
+                    h = s = 0;
+                } else {
+                    const d = max - min;
+                    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                    
+                    switch (max) {
+                        case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                        case g: h = (b - r) / d + 2; break;
+                        case b: h = (r - g) / d + 4; break;
+                    }
+                    h /= 6;
+                }
+                
+                return [h * 360, s * 100, l * 100];
+            }
+            
+            hslToHex(h, s, l) {
+                h /= 360;
+                s /= 100;
+                l /= 100;
+                
+                const hue2rgb = (p, q, t) => {
+                    if (t < 0) t += 1;
+                    if (t > 1) t -= 1;
+                    if (t < 1/6) return p + (q - p) * 6 * t;
+                    if (t < 1/2) return q;
+                    if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+                    return p;
+                };
+                
+                let r, g, b;
+                if (s === 0) {
+                    r = g = b = l;
+                } else {
+                    const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+                    const p = 2 * l - q;
+                    r = hue2rgb(p, q, h + 1/3);
+                    g = hue2rgb(p, q, h);
+                    b = hue2rgb(p, q, h - 1/3);
+                }
+                
+                const toHex = (c) => {
+                    const hex = Math.round(c * 255).toString(16);
+                    return hex.length === 1 ? '0' + hex : hex;
+                };
+                
+                return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+            }
+            
+            generatePalette(baseColor) {
+                const [h, s, l] = this.hexToHsl(baseColor);
+                
+                return {
+                    light: {
+                        accentPrimary: baseColor,
+                        accentLowContrast: this.hslToHex(h, Math.max(10, s - 40), Math.min(95, l + 40)),
+                        backgroundPrimary: this.hslToHex(h, Math.max(5, s - 80), 96),
+                        backgroundSecondary: this.hslToHex(h, Math.max(5, s - 80), 98),
+                        contentPrimary: this.hslToHex(h, Math.min(100, s + 20), 15),
+                        contentSecondary: this.hslToHex(h, Math.max(10, s - 20), 35)
+                    },
+                    dark: {
+                        accentPrimary: this.hslToHex(h, s, Math.min(80, l + 20)),
+                        accentLowContrast: this.hslToHex(h, Math.max(20, s - 30), Math.max(25, l - 20)),
+                        backgroundPrimary: this.hslToHex(h, Math.max(10, s - 40), 8),
+                        backgroundSecondary: this.hslToHex(h, Math.max(10, s - 40), 12),
+                        contentPrimary: this.hslToHex(h, Math.max(5, s - 80), 95),
+                        contentSecondary: this.hslToHex(h, Math.max(10, s - 60), 65)
+                    }
+                };
+            }
+            
+            updateThemes(color) {
+                const palette = this.generatePalette(color);
+                
+                // Update light theme
+                document.getElementById('lightAccentPrimary').style.backgroundColor = palette.light.accentPrimary;
+                document.getElementById('lightAccentLowContrast').style.backgroundColor = palette.light.accentLowContrast;
+                document.getElementById('lightBackgroundPrimary').style.backgroundColor = palette.light.backgroundPrimary;
+                document.getElementById('lightBackgroundSecondary').style.backgroundColor = palette.light.backgroundSecondary;
+                document.getElementById('lightContentPrimary').style.backgroundColor = palette.light.contentPrimary;
+                document.getElementById('lightContentSecondary').style.backgroundColor = palette.light.contentSecondary;
+                
+                // Update dark theme
+                document.getElementById('darkAccentPrimary').style.backgroundColor = palette.dark.accentPrimary;
+                document.getElementById('darkAccentLowContrast').style.backgroundColor = palette.dark.accentLowContrast;
+                document.getElementById('darkBackgroundPrimary').style.backgroundColor = palette.dark.backgroundPrimary;
+                document.getElementById('darkBackgroundSecondary').style.backgroundColor = palette.dark.backgroundSecondary;
+                document.getElementById('darkContentPrimary').style.backgroundColor = palette.dark.contentPrimary;
+                document.getElementById('darkContentSecondary').style.backgroundColor = palette.dark.contentSecondary;
+            }
+        }
+        
+        // Initialize the theme customizer when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new ThemeCustomizer();
+        });
+    </script>
+</body>
+</html>
