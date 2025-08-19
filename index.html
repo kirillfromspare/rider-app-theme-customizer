@@ -516,9 +516,15 @@
             background: var(--bg-primary);
         }
 
-        .save-btn {
-            display: block;
+        .export-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             margin: 40px auto 0;
+            gap: 10px;
+        }
+
+        .save-btn {
             background: var(--accent-primary, #007AFF);
             color: white;
             border: none;
@@ -533,6 +539,38 @@
         .save-btn:hover {
             transform: translateY(-1px);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .export-options {
+            display: flex;
+            gap: 10px;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .export-options.show {
+            opacity: 1;
+            transform: translateY(0);
+            display: flex;
+        }
+
+        .export-btn {
+            background: #f8f9fa;
+            color: #333;
+            border: 2px solid #dee2e6;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .export-btn:hover {
+            background: #e9ecef;
+            border-color: #adb5bd;
+            transform: translateY(-1px);
         }
 
         @media (max-width: 768px) {
@@ -740,7 +778,14 @@
             </div>
         </div>
 
-        <button class="save-btn">Save Changes</button>
+        <div class="export-section">
+            <button class="save-btn" id="exportBtn">Save Changes</button>
+            <div class="export-options" id="exportOptions" style="display: none;">
+                <button class="export-btn" data-format="css">Export as CSS</button>
+                <button class="export-btn" data-format="json">Export as JSON</button>
+                <button class="export-btn" data-format="scss">Export as SCSS</button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -752,6 +797,8 @@
                 this.colorGradient = document.getElementById('colorGradient');
                 this.colorHandle = document.getElementById('colorHandle');
                 this.resetBtn = document.getElementById('resetBtn');
+                this.exportBtn = document.getElementById('exportBtn');
+                this.exportOptions = document.getElementById('exportOptions');
                 
                 this.isDragging = false;
                 
@@ -765,6 +812,12 @@
                 this.colorGradient.addEventListener('click', this.handleGradientClick.bind(this));
                 this.colorHandle.addEventListener('mousedown', this.handleMouseDown.bind(this));
                 this.resetBtn.addEventListener('click', this.resetToDefault.bind(this));
+                this.exportBtn.addEventListener('click', this.toggleExportOptions.bind(this));
+                
+                // Add event listeners for export buttons
+                document.querySelectorAll('.export-btn').forEach(btn => {
+                    btn.addEventListener('click', this.handleExport.bind(this));
+                });
                 
                 document.addEventListener('mousemove', this.handleMouseMove.bind(this));
                 document.addEventListener('mouseup', this.handleMouseUp.bind(this));
@@ -775,6 +828,10 @@
                 
                 const rect = this.colorGradient.getBoundingClientRect();
                 const position = (e.clientX - rect.left) / rect.width;
+                
+                // Block selection in excluded range
+                if (this.isPositionExcluded(position)) return;
+                
                 this.setHandlePosition(Math.max(0, Math.min(1, position)));
                 this.updateColorFromPosition(position);
             }
@@ -791,6 +848,10 @@
                 e.preventDefault();
                 const rect = this.colorGradient.getBoundingClientRect();
                 const position = (e.clientX - rect.left) / rect.width;
+                
+                // Block dragging into excluded range
+                if (this.isPositionExcluded(position)) return;
+                
                 const clampedPosition = Math.max(0, Math.min(1, position));
                 
                 this.setHandlePosition(clampedPosition);
@@ -817,62 +878,15 @@
                 this.toggleResetButton();
             }
             
-            /**
-             * Calculates the reference contrast ratio using the original default blue color
-             * This serves as the maximum darkness threshold for any selected color
-             * @returns {number} - The reference contrast ratio
-             */
-            calculateReferenceContrastRatio() {
-                // Use the original default blue color
-                const defaultBlue = '#0362FF';
+            isPositionExcluded(position) {
+                // Define excluded range based on your pixel positions
+                // 209px to 260px out of 400px width
+                const excludeStart = 209 / 400; // ~0.5225
+                const excludeEnd = 260 / 400;   // ~0.65
                 
-                // Calculate what the background secondary would be for this default color
-                const lightBgPrimary = '#ffffff';
-                const referenceSecondary = this.createAccessibleSecondary(defaultBlue, lightBgPrimary);
-                
-                // Calculate contrast ratio between default blue and its derived background
-                const referenceRatio = chroma.contrast(defaultBlue, referenceSecondary);
-                
-                // Lower the darkness threshold by reducing the reference ratio by 20%
-                // This allows lighter colors to be selected
-                const adjustedRatio = referenceRatio * 0.8;
-                
-                return adjustedRatio;
+                return position >= excludeStart && position <= excludeEnd;
             }
             
-            /**
-             * Ensures a color doesn't exceed the reference darkness by checking contrast ratio
-             * @param {string} color - Color to check/adjust
-             * @returns {string} - Adjusted color that doesn't exceed reference darkness
-             */
-            limitColorDarkness(color) {
-                // Get the reference contrast ratio from the default blue
-                const referenceRatio = this.calculateReferenceContrastRatio();
-                
-                const lightBgPrimary = '#ffffff';
-                const testSecondary = this.createAccessibleSecondary(color, lightBgPrimary);
-                const currentRatio = chroma.contrast(color, testSecondary);
-                
-                // If the current color creates a higher contrast ratio (meaning it's darker)
-                // than our reference, we need to lighten it
-                if (currentRatio > referenceRatio) {
-                    let adjustedColor = chroma(color);
-                    
-                    // Gradually lighten the color until it matches the reference ratio
-                    for (let i = 0; i < 100; i++) {
-                        adjustedColor = adjustedColor.brighten(0.05);
-                        const newTestSecondary = this.createAccessibleSecondary(adjustedColor.hex(), lightBgPrimary);
-                        const newRatio = chroma.contrast(adjustedColor, newTestSecondary);
-                        
-                        // Stop when we reach or go below the reference ratio
-                        if (newRatio <= referenceRatio) {
-                            return adjustedColor.hex();
-                        }
-                    }
-                }
-                
-                return color;
-            }
             
             getColorFromGradientPosition(position) {
                 // Define the gradient stops
@@ -906,10 +920,7 @@
                 const g = Math.round(startStop.color[1] + (endStop.color[1] - startStop.color[1]) * ratio);
                 const b = Math.round(startStop.color[2] + (endStop.color[2] - startStop.color[2]) * ratio);
                 
-                let color = `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
-                
-                // Apply contrast ratio-based darkness control
-                color = this.limitColorDarkness(color);
+                const color = `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
                 
                 return color;
             }
@@ -1092,6 +1103,176 @@
                 
                 // Update root CSS variables for Save button (use light theme colors for consistency)
                 document.documentElement.style.setProperty('--accent-primary', palette.light.accentPrimary);
+            }
+            
+            toggleExportOptions() {
+                const isVisible = this.exportOptions.style.display !== 'none';
+                if (isVisible) {
+                    this.exportOptions.classList.remove('show');
+                    setTimeout(() => {
+                        this.exportOptions.style.display = 'none';
+                    }, 300);
+                } else {
+                    this.exportOptions.style.display = 'flex';
+                    setTimeout(() => {
+                        this.exportOptions.classList.add('show');
+                    }, 10);
+                }
+            }
+            
+            handleExport(e) {
+                const format = e.target.dataset.format;
+                const palette = this.generatePalette(this.currentColor);
+                
+                let content = '';
+                let filename = '';
+                let mimeType = 'text/plain';
+                
+                switch (format) {
+                    case 'css':
+                        content = this.generateCSSExport(palette);
+                        filename = 'theme-colors.css';
+                        mimeType = 'text/css';
+                        break;
+                    case 'json':
+                        content = this.generateJSONExport(palette);
+                        filename = 'theme-colors.json';
+                        mimeType = 'application/json';
+                        break;
+                    case 'scss':
+                        content = this.generateSCSSExport(palette);
+                        filename = 'theme-colors.scss';
+                        mimeType = 'text/scss';
+                        break;
+                }
+                
+                this.downloadFile(content, filename, mimeType);
+                this.toggleExportOptions(); // Close the export options
+            }
+            
+            generateCSSExport(palette) {
+                return `/* Theme Colors Generated by Rider App Theme Customizer */
+/* Base Color: ${this.currentColor} */
+
+:root {
+  /* Light Theme */
+  --accent-primary-light: ${palette.light.accentPrimary};
+  --accent-low-contrast-light: ${palette.light.accentLowContrast};
+  --background-primary-light: ${palette.light.backgroundPrimary};
+  --background-secondary-light: ${palette.light.backgroundSecondary};
+  --content-primary-light: ${palette.light.contentPrimary};
+  --content-secondary-light: ${palette.light.contentSecondary};
+  
+  /* Dark Theme */
+  --accent-primary-dark: ${palette.dark.accentPrimary};
+  --accent-low-contrast-dark: ${palette.dark.accentLowContrast};
+  --background-primary-dark: ${palette.dark.backgroundPrimary};
+  --background-secondary-dark: ${palette.dark.backgroundSecondary};
+  --content-primary-dark: ${palette.dark.contentPrimary};
+  --content-secondary-dark: ${palette.dark.contentSecondary};
+}
+
+/* Light Theme Application */
+[data-theme="light"] {
+  --accent-primary: var(--accent-primary-light);
+  --accent-low-contrast: var(--accent-low-contrast-light);
+  --background-primary: var(--background-primary-light);
+  --background-secondary: var(--background-secondary-light);
+  --content-primary: var(--content-primary-light);
+  --content-secondary: var(--content-secondary-light);
+}
+
+/* Dark Theme Application */
+[data-theme="dark"] {
+  --accent-primary: var(--accent-primary-dark);
+  --accent-low-contrast: var(--accent-low-contrast-dark);
+  --background-primary: var(--background-primary-dark);
+  --background-secondary: var(--background-secondary-dark);
+  --content-primary: var(--content-primary-dark);
+  --content-secondary: var(--content-secondary-dark);
+}`;
+            }
+            
+            generateJSONExport(palette) {
+                const themeData = {
+                    baseColor: this.currentColor,
+                    generatedAt: new Date().toISOString(),
+                    themes: {
+                        light: palette.light,
+                        dark: palette.dark
+                    }
+                };
+                
+                return JSON.stringify(themeData, null, 2);
+            }
+            
+            generateSCSSExport(palette) {
+                return `// Theme Colors Generated by Rider App Theme Customizer
+// Base Color: ${this.currentColor}
+// Generated: ${new Date().toISOString()}
+
+// Light Theme Variables
+$accent-primary-light: ${palette.light.accentPrimary};
+$accent-low-contrast-light: ${palette.light.accentLowContrast};
+$background-primary-light: ${palette.light.backgroundPrimary};
+$background-secondary-light: ${palette.light.backgroundSecondary};
+$content-primary-light: ${palette.light.contentPrimary};
+$content-secondary-light: ${palette.light.contentSecondary};
+
+// Dark Theme Variables
+$accent-primary-dark: ${palette.dark.accentPrimary};
+$accent-low-contrast-dark: ${palette.dark.accentLowContrast};
+$background-primary-dark: ${palette.dark.backgroundPrimary};
+$background-secondary-dark: ${palette.dark.backgroundSecondary};
+$content-primary-dark: ${palette.dark.contentPrimary};
+$content-secondary-dark: ${palette.dark.contentSecondary};
+
+// Theme Maps
+$light-theme: (
+  accent-primary: $accent-primary-light,
+  accent-low-contrast: $accent-low-contrast-light,
+  background-primary: $background-primary-light,
+  background-secondary: $background-secondary-light,
+  content-primary: $content-primary-light,
+  content-secondary: $content-secondary-light
+);
+
+$dark-theme: (
+  accent-primary: $accent-primary-dark,
+  accent-low-contrast: $accent-low-contrast-dark,
+  background-primary: $background-primary-dark,
+  background-secondary: $background-secondary-dark,
+  content-primary: $content-primary-dark,
+  content-secondary: $content-secondary-dark
+);
+
+// Mixin for applying themes
+@mixin theme($theme-map) {
+  @each $property, $color in $theme-map {
+    --#{$property}: #{$color};
+  }
+}
+
+// Theme classes
+.theme-light {
+  @include theme($light-theme);
+}
+
+.theme-dark {
+  @include theme($dark-theme);
+}`;
+            }
+            
+            downloadFile(content, filename, mimeType) {
+                const blob = new Blob([content], { type: mimeType });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
             }
         }
         
