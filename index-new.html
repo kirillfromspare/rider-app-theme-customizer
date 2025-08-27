@@ -1,0 +1,2238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theme Customizer</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/2.4.2/chroma.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f5f5;
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 100%;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Fixed Header Controls */
+        .header-controls {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-bottom: 1px solid #e1e5e9;
+            z-index: 100;
+            padding: 20px 20px 0 20px;
+        }
+
+        .controls-container {
+            display: flex;
+            gap: 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .controls-left {
+            flex: 1;
+            min-width: 350px;
+        }
+
+        .controls-right {
+            flex: 1;
+        }
+
+        .header-toggle {
+            display: flex;
+            justify-content: center;
+            background: white;
+            padding: 12px 20px 0 20px;
+        }
+
+        /* Select Color Section */
+        .color-selector-section h2 {
+            color: var(--Content-contentPrimary, #1C2136);
+            text-align: center;
+            font-feature-settings: 'liga' off, 'clig' off;
+            font-family: "SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            line-height: 20px;
+            margin-bottom: 16px;
+        }
+
+        .color-input-container {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .hex-input {
+            width: 100px;
+            padding: 12px 16px;
+            border: 1px solid #ddd;
+            border-radius: 24px;
+            font-family: Inter, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+            font-feature-settings: 'ss01' on, 'ss02' on;
+            background: white;
+            color: var(--Content-contentPrimary, #1C2136);
+        }
+
+        .color-picker-container {
+            flex: 1;
+            height: 48px;
+            position: relative;
+            border-radius: 24px;
+            overflow: hidden;
+        }
+
+        .color-gradient {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to right,
+                #ff0000 0%,
+                #ffff00 16.66%,
+                #00ff00 33.33%,
+                #00ffff 50%,
+                #0000ff 66.66%,
+                #ff00ff 83.33%,
+                #ff0000 100%
+            );
+            position: relative;
+            cursor: pointer;
+            border-radius: 32px;
+        }
+
+        .color-handle {
+            width: 24px;
+            height: 24px;
+            background: white;
+            border: 3px solid white;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            cursor: grab;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            z-index: 2;
+        }
+
+        .reset-section {
+            text-align: center;
+            margin: 0;
+        }
+
+        .reset-btn {
+            background: #f8f9fa;
+            color: #666;
+            border: 1px solid #ddd;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .reset-btn.show {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+
+        /* Hue and Saturation Controls */
+        .hue-saturation-controls {
+            display: flex;
+            gap: 30px;
+        }
+
+        .control-group {
+            flex: 1;
+        }
+
+        .control-group h3 {
+            color: var(--Content-contentPrimary, #1C2136);
+            font-family: "SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .control-points {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .control-point {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .control-point label {
+            font-family: "SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--Content-contentSecondary, #6c757d);
+            min-width: 120px;
+            white-space: nowrap;
+        }
+
+        .control-slider {
+            flex: 1;
+            height: 4px;
+            border-radius: 2px;
+            outline: none;
+            cursor: pointer;
+            background: #e1e5e9;
+        }
+
+        .hue-slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #007bff;
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .saturation-slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #007bff;
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Preview Toggle */
+        .preview-toggle {
+            position: fixed;
+            top: 140px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 99;
+        }
+
+
+        /* Preview Area */
+        .preview-area {
+            margin-top: 240px;
+            overflow-y: auto;
+            min-height: calc(100vh - 240px);
+        }
+
+        .toggle-btn {
+            padding: 12px 24px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            font-size: 14px;
+            color: #666;
+            transition: all 0.2s ease;
+        }
+
+        .toggle-btn.active {
+            color: #0062FF;
+            border-bottom-color: #0062FF;
+        }
+
+        .toggle-btn:hover {
+            color: #0062FF;
+        }
+
+        .preview-content {
+            display: none;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .preview-content.active {
+            display: block;
+        }
+
+        /* Color Scale */
+        .color-scale-section {
+            margin: 0 auto 30px auto;
+            max-width: 1200px;
+        }
+
+        .color-scale {
+            display: flex;
+            height: 80px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .scale-increment {
+            flex: 1;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding: 8px 4px;
+            font-family: Inter, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            font-feature-settings: 'ss01' on, 'ss02' on;
+            color: white;
+        }
+
+        /* Themes Container */
+        .themes-container {
+            display: flex;
+            background: #f8f9fa;
+            border: 1px solid #e1e5e9;
+            border-radius: 16px;
+            overflow: hidden;
+            margin: 20px auto;
+            max-width: 1200px;
+        }
+
+        .theme-panel {
+            flex: 1;
+            position: relative;
+        }
+
+        .theme-panel:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background: #e1e5e9;
+        }
+
+        .theme-header {
+            padding: 16px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.05);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .light-theme .theme-header {
+            color: #1a1a1a;
+            background: #f8f9fa;
+        }
+
+        .dark-theme .theme-header {
+            color: #ffffff;
+            background: #2a2a2a;
+        }
+
+        .ui-preview {
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            min-height: 500px;
+        }
+
+        .light-theme .ui-preview {
+            background: #ffffff;
+        }
+
+        .dark-theme .ui-preview {
+            background: #1a1a1a;
+        }
+
+        .ui-section {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .ui-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background: var(--accent-primary);
+            color: var(--content-inverted-primary);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-primary-hover);
+        }
+
+
+        .btn-secondary {
+            background: var(--accent-low-contrast);
+            color: var(--accent-high-contrast);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-secondary:hover {
+            background: var(--accent-low-contrast-hover);
+        }
+
+        .btn-tertiary {
+            background: none;
+            color: var(--accent-primary);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-tertiary:hover {
+            background: var(--accent-tertiary-hover);
+        }
+
+        /* Danger Buttons */
+        .btn-danger-primary {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-danger-primary:hover {
+            background: #c82333;
+        }
+
+        .dark-theme .btn-danger-primary {
+            background: #FA4C69;
+            color: #660011;
+        }
+
+        .light-theme .btn-danger-secondary {
+            background: rgba(220, 53, 69, 0.1);
+            color: #800015;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .dark-theme .btn-danger-secondary {
+            background: rgba(220, 53, 69, 0.1);
+            color: #FFDBE1;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-danger-secondary:hover {
+            background: #FFBDC8;
+        }
+
+        .btn-danger-text {
+            background: none;
+            color: #dc3545;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-danger-text:hover {
+            background: rgba(220, 53, 69, 0.1);
+        }
+
+        /* Input Fields */
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            min-width: 200px;
+        }
+
+        .input-group label {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--content-primary);
+        }
+
+        .input-field {
+            padding: 12px 16px;
+            border: 1px solid var(--content-secondary);
+            border-radius: 8px;
+            font-size: 14px;
+            background: transparent;
+            color: var(--content-primary);
+            transition: all 0.2s ease;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(var(--accent-primary-rgb), 0.1);
+        }
+
+        .input-field.error {
+            border-color: #dc3545;
+        }
+
+        .input-hint {
+            font-size: 12px;
+            color: var(--content-secondary);
+        }
+
+        .input-hint.error {
+            color: #dc3545;
+        }
+
+        /* Form Controls */
+        .form-controls {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .radio-label, .checkbox-label {
+            position: relative;
+            cursor: pointer;
+            padding-left: 25px;
+            min-height: 20px;
+            display: inline-block;
+        }
+
+        .radio-input, .checkbox-input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .radio-custom, .checkbox-custom {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 20px;
+            width: 20px;
+            background: transparent;
+            border: 2px solid var(--content-primary);
+            transition: all 0.2s ease;
+        }
+
+        .radio-custom {
+            border-radius: 50%;
+        }
+
+        .checkbox-custom {
+            border-radius: 4px;
+        }
+
+        .radio-input:checked ~ .radio-custom {
+            background: var(--accent-primary);
+            border-color: var(--accent-primary);
+        }
+
+        .checkbox-input:checked ~ .checkbox-custom {
+            background: var(--accent-primary);
+            border-color: var(--accent-primary);
+        }
+
+        .radio-custom:after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+
+        .radio-input:checked ~ .radio-custom:after {
+            display: block;
+        }
+
+        .radio-custom:after {
+            top: 4px;
+            left: 4px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: white;
+        }
+
+        .checkbox-custom:after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+
+        .checkbox-input:checked ~ .checkbox-custom:after {
+            display: block;
+        }
+
+        .checkbox-custom:after {
+            left: 6px;
+            top: 2px;
+            width: 5px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            background: var(--content-secondary);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-switch.active {
+            background: var(--accent-primary);
+        }
+
+        .toggle-handle {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .toggle-switch.active .toggle-handle {
+            transform: translateX(20px);
+        }
+
+        /* Stepper */
+        .stepper {
+            display: flex;
+            align-items: center;
+            border-radius: 32px;
+            overflow: hidden;
+        }
+
+        .stepper-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: var(--bg-secondary);
+            color: var(--accent-primary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .stepper-btn:hover {
+            background: var(--accent-low-contrast);
+        }
+
+        .stepper-value {
+            padding: 0 16px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--content-primary);
+            background: var(--bg-secondary);
+            height: 32px;
+            display: flex;
+            align-items: center;
+            min-width: 40px;
+            justify-content: center;
+        }
+
+        /* Token Mapping Section */
+        .token-mapping-section {
+            margin: 20px auto;
+            max-width: 1200px;
+            position: relative;
+        }
+
+        .export-button {
+            position: fixed;
+            bottom: 32px;
+            right: 32px;
+            background: #0062FF;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: none;
+            z-index: 1000;
+        }
+
+        .export-button:hover {
+            background: #0056E0;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 98, 255, 0.3);
+        }
+
+        .export-button.show {
+            display: block;
+        }
+
+        .token-table {
+            border: 1px solid #e1e5e9;
+            border-radius: 12px;
+            overflow: hidden;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .token-header {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e1e5e9;
+        }
+
+        .token-header .token-name,
+        .token-header .token-theme {
+            padding: 16px 20px;
+            font-family: "SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--Content-contentPrimary, #1C2136);
+            border-right: 1px solid #e1e5e9;
+        }
+
+        .token-header .token-name {
+            background: #f0f1f3;
+        }
+
+        .token-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            border-bottom: 1px solid #f0f0f0;
+            transition: all 0.2s ease;
+        }
+
+        .token-row:hover {
+            background: #f8f9fa;
+        }
+
+        .token-row .token-name {
+            padding: 20px;
+            background: #fafbfc;
+            border-right: 1px solid #e1e5e9;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: Inter, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--Content-contentPrimary, #1C2136);
+            font-feature-settings: 'ss01' on, 'ss02' on;
+        }
+
+        .token-color {
+            padding: 20px;
+            border-right: 1px solid #e1e5e9;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .color-swatch {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            border: 1px solid #e1e5e9;
+            flex-shrink: 0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .color-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            text-align: left;
+        }
+
+        .color-label {
+            font-family: Inter, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--Content-contentPrimary, #1C2136);
+            font-feature-settings: 'ss01' on, 'ss02' on;
+        }
+
+        .color-hex {
+            font-family: Inter, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            font-size: 12px;
+            font-weight: 500;
+            color: #6c757d;
+            font-feature-settings: 'ss01' on, 'ss02' on;
+        }
+
+        @media (max-width: 768px) {
+            .controls-container {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .hue-saturation-controls {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .themes-container {
+                flex-direction: column;
+                max-width: 100%;
+                margin: 20px;
+            }
+            
+            .theme-panel:not(:last-child)::after {
+                display: none;
+            }
+            
+            .ui-preview {
+                padding: 30px 20px;
+                min-height: auto;
+            }
+            
+            .token-header {
+                grid-template-columns: 1fr 1fr 1fr 1fr;
+                font-size: 12px;
+            }
+            
+            .token-row {
+                grid-template-columns: 1fr 1fr 1fr 1fr;
+            }
+            
+            .token-row .token-name {
+                padding: 16px 12px;
+                font-size: 11px;
+            }
+            
+            .token-color {
+                padding: 16px 12px;
+                gap: 8px;
+            }
+            
+            .color-swatch {
+                width: 20px;
+                height: 20px;
+            }
+            
+            .color-label {
+                font-size: 11px;
+            }
+            
+            .color-hex {
+                font-size: 10px;
+            }
+            
+            .export-button {
+                position: static;
+                margin: 20px auto;
+                display: block;
+            }
+            
+            .token-mapping-section {
+                margin: 20px 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Fixed Header with Controls -->
+        <div class="header-controls">
+            <div class="controls-container">
+                <div class="controls-left">
+                    <div class="color-selector-section">
+                        <h2>Select Color</h2>
+                        <div class="color-input-container">
+                            <input type="text" id="hexInput" class="hex-input" value="#0062FF" placeholder="#0062FF">
+                            <div class="color-picker-container">
+                                <div class="color-gradient" id="colorGradient">
+                                    <div class="color-handle" id="colorHandle"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="reset-section">
+                            <button class="reset-btn" id="resetBtn">🔵 Reset to Default</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="controls-right">
+                    <div class="hue-saturation-controls">
+                        <div class="control-group">
+                            <h3>Hue</h3>
+                            <div class="control-points">
+                                <div class="control-point">
+                                    <label>Light end (05): <span id="bottomHueValue">0°</span></label>
+                                    <input type="range" id="bottomHue" min="0" max="360" value="0" class="control-slider hue-slider">
+                                </div>
+                                <div class="control-point">
+                                    <label>Middle (50): <span id="middleHueValue">0°</span></label>
+                                    <input type="range" id="middleHue" min="0" max="360" value="0" class="control-slider hue-slider">
+                                </div>
+                                <div class="control-point">
+                                    <label>Dark End (95): <span id="topHueValue">0°</span></label>
+                                    <input type="range" id="topHue" min="0" max="360" value="0" class="control-slider hue-slider">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="control-group">
+                            <h3>Saturation</h3>
+                            <div class="control-points">
+                                <div class="control-point">
+                                    <label>Light end (05): <span id="bottomSaturationValue">100%</span></label>
+                                    <input type="range" id="bottomSaturation" min="0" max="100" value="100" class="control-slider saturation-slider">
+                                </div>
+                                <div class="control-point">
+                                    <label>Middle (50): <span id="middleSaturationValue">100%</span></label>
+                                    <input type="range" id="middleSaturation" min="0" max="100" value="100" class="control-slider saturation-slider">
+                                </div>
+                                <div class="control-point">
+                                    <label>Dark End (95): <span id="topSaturationValue">100%</span></label>
+                                    <input type="range" id="topSaturation" min="0" max="100" value="100" class="control-slider saturation-slider">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Toggle Buttons -->
+            <div class="header-toggle">
+                <button class="toggle-btn active" id="uiPreviewTab">UI Preview</button>
+                <button class="toggle-btn" id="hexCodesTab">hex-codes</button>
+            </div>
+        </div>
+        
+        <!-- Preview Area -->
+        <div class="preview-area">
+            <!-- UI Preview Content -->
+            <div class="preview-content active" id="uiPreviewContent">
+                <div class="themes-container">
+                    <div class="theme-panel light-theme" id="lightTheme">
+                        <div class="theme-header">Light Theme</div>
+                        <div class="ui-preview">
+                            <!-- Buttons Section -->
+                            <div class="ui-section">
+                                <div class="ui-row">
+                                    <button class="btn-primary">Label</button>
+                                    <button class="btn-secondary">Label</button>
+                                    <button class="btn-tertiary">Label</button>
+                                </div>
+                                <div class="ui-row">
+                                    <button class="btn-danger-primary">Label</button>
+                                    <button class="btn-danger-secondary">Label</button>
+                                    <button class="btn-danger-text">Label</button>
+                                </div>
+                            </div>
+
+                            <!-- Input Fields Section -->
+                            <div class="ui-section">
+                                <div class="ui-row">
+                                    <div class="input-group">
+                                        <label>Label</label>
+                                        <input type="text" placeholder="Placeholder" class="input-field">
+                                        <span class="input-hint">Hint</span>
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Label</label>
+                                        <input type="text" placeholder="Place" class="input-field error">
+                                        <span class="input-hint error">Hint</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Toggle and Checkbox Section -->
+                            <div class="ui-section">
+                                <div class="ui-row">
+                                    <div class="form-controls">
+                                        <label class="radio-label">
+                                            <input type="radio" name="radio1" class="radio-input">
+                                            <span class="radio-custom"></span>
+                                        </label>
+                                        <label class="radio-label">
+                                            <input type="radio" name="radio1" class="radio-input" checked>
+                                            <span class="radio-custom"></span>
+                                        </label>
+                                        <label class="checkbox-label">
+                                            <input type="checkbox" class="checkbox-input">
+                                            <span class="checkbox-custom"></span>
+                                        </label>
+                                        <label class="checkbox-label">
+                                            <input type="checkbox" class="checkbox-input" checked>
+                                            <span class="checkbox-custom"></span>
+                                        </label>
+                                        <div class="toggle-switch active">
+                                            <div class="toggle-handle"></div>
+                                        </div>
+                                        <div class="toggle-switch">
+                                            <div class="toggle-handle"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Stepper Section -->
+                            <div class="ui-section">
+                                <div class="ui-row">
+                                    <div class="stepper">
+                                        <button class="stepper-btn">−</button>
+                                        <span class="stepper-value">1</span>
+                                        <button class="stepper-btn">+</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="theme-panel dark-theme" id="darkTheme">
+                        <div class="theme-header">Dark Theme</div>
+                        <div class="ui-preview">
+                            <!-- Buttons Section -->
+                            <div class="ui-section">
+                                <div class="ui-row">
+                                    <button class="btn-primary">Label</button>
+                                    <button class="btn-secondary">Label</button>
+                                    <button class="btn-tertiary">Label</button>
+                                </div>
+                                <div class="ui-row">
+                                    <button class="btn-danger-primary">Label</button>
+                                    <button class="btn-danger-secondary">Label</button>
+                                    <button class="btn-danger-text">Label</button>
+                                </div>
+                            </div>
+
+                            <!-- Input Fields Section -->
+                            <div class="ui-section">
+                                <div class="ui-row">
+                                    <div class="input-group">
+                                        <label>Label</label>
+                                        <input type="text" placeholder="Placeholder" class="input-field">
+                                        <span class="input-hint">Hint</span>
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Label</label>
+                                        <input type="text" placeholder="Place" class="input-field error">
+                                        <span class="input-hint error">Hint</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Toggle and Checkbox Section -->
+                            <div class="ui-section">
+                                <div class="ui-row">
+                                    <div class="form-controls">
+                                        <label class="radio-label">
+                                            <input type="radio" name="radio2" class="radio-input">
+                                            <span class="radio-custom"></span>
+                                        </label>
+                                        <label class="radio-label">
+                                            <input type="radio" name="radio2" class="radio-input" checked>
+                                            <span class="radio-custom"></span>
+                                        </label>
+                                        <label class="checkbox-label">
+                                            <input type="checkbox" class="checkbox-input">
+                                            <span class="checkbox-custom"></span>
+                                        </label>
+                                        <label class="checkbox-label">
+                                            <input type="checkbox" class="checkbox-input" checked>
+                                            <span class="checkbox-custom"></span>
+                                        </label>
+                                        <div class="toggle-switch active">
+                                            <div class="toggle-handle"></div>
+                                        </div>
+                                        <div class="toggle-switch">
+                                            <div class="toggle-handle"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Stepper Section -->
+                            <div class="ui-section">
+                                <div class="ui-row">
+                                    <div class="stepper">
+                                        <button class="stepper-btn">−</button>
+                                        <span class="stepper-value">1</span>
+                                        <button class="stepper-btn">+</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Hex Codes Content (Initially Hidden) -->
+            <div class="preview-content" id="hexCodesContent">
+                <div class="color-scale-section">
+                    <div class="color-scale" id="colorScale">
+                        <!-- Color scale will be generated here -->
+                    </div>
+                </div>
+                
+                <div class="token-mapping-section">
+                    <button class="export-button" id="exportButton">Export as JSON</button>
+                    <div class="token-table">
+                        <div class="token-header">
+                            <div class="token-name">Name</div>
+                            <div class="token-theme">Light Mode</div>
+                            <div class="token-theme">Dark Mode</div>
+                            <div class="token-theme">Light Mode High Contrast</div>
+                        </div>
+                        
+                <div class="token-row">
+                    <div class="token-name">
+                        <span class="token-icon">🎯</span>
+                        <span>interactivePrimary</span>
+                    </div>
+                    <div class="token-color" data-increment="50">
+                        <div class="color-swatch" id="token-light-50"></div>
+                        <div class="color-info">
+                            <span class="color-label">custom/custom50</span>
+                            <span class="color-hex" id="token-hex-light-50">#000000</span>
+                        </div>
+                    </div>
+                    <div class="token-color" data-increment="30">
+                        <div class="color-swatch" id="token-dark-30"></div>
+                        <div class="color-info">
+                            <span class="color-label">custom/custom30</span>
+                            <span class="color-hex" id="token-hex-dark-30">#000000</span>
+                        </div>
+                    </div>
+                    <div class="token-color" data-increment="60">
+                        <div class="color-swatch" id="token-hc-60"></div>
+                        <div class="color-info">
+                            <span class="color-label">custom/custom60</span>
+                            <span class="color-hex" id="token-hex-hc-60">#000000</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="token-row">
+                    <div class="token-name">
+                        <span class="token-icon">🎯</span>
+                        <span>interactivePrimaryHover</span>
+                    </div>
+                    <div class="token-color" data-increment="55">
+                        <div class="color-swatch" id="token-hover-light-55"></div>
+                        <div class="color-info">
+                            <span class="color-label">custom/custom55</span>
+                            <span class="color-hex" id="token-hex-hover-light-55">#000000</span>
+                        </div>
+                    </div>
+                    <div class="token-color" data-increment="25">
+                        <div class="color-swatch" id="token-hover-dark-25"></div>
+                        <div class="color-info">
+                            <span class="color-label">custom/custom25</span>
+                            <span class="color-hex" id="token-hex-hover-dark-25">#000000</span>
+                        </div>
+                    </div>
+                    <div class="token-color" data-increment="70">
+                        <div class="color-swatch" id="token-hover-hc-70"></div>
+                        <div class="color-info">
+                            <span class="color-label">custom/custom70</span>
+                            <span class="color-hex" id="token-hex-hover-hc-70">#000000</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="token-row">
+                    <div class="token-name">
+                        <span class="token-icon">🎯</span>
+                        <span>interactiveLowContrast</span>
+                    </div>
+                    <div class="token-color" data-increment="10">
+                        <div class="color-swatch" id="token-light-10"></div>
+                        <div class="color-info">
+                            <span class="color-label">custom/custom10</span>
+                            <span class="color-hex" id="token-hex-light-10">#000000</span>
+                        </div>
+                    </div>
+                    <div class="token-color" data-increment="70">
+                        <div class="color-swatch" id="token-dark-70"></div>
+                        <div class="color-info">
+                            <span class="color-label">custom/custom70</span>
+                            <span class="color-hex" id="token-hex-dark-70">#000000</span>
+                        </div>
+                    </div>
+                    <div class="token-color" data-increment="20">
+                        <div class="color-swatch" id="token-hc-20"></div>
+                        <div class="color-info">
+                            <span class="color-label">custom/custom20</span>
+                            <span class="color-hex" id="token-hex-hc-20">#000000</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="token-row">
+                    <div class="token-name">
+                        <span class="token-icon">🎯</span>
+                        <span>interactiveLowContrastHover</span>
+                    </div>
+                    <div class="token-color" data-increment="20">
+                        <div class="color-swatch" id="token-low-hover-light-20"></div>
+                        <div class="color-info">
+                            <span class="color-label">custom/custom20</span>
+                            <span class="color-hex" id="token-hex-low-hover-light-20">#000000</span>
+                        </div>
+                    </div>
+                    <div class="token-color" data-increment="60">
+                        <div class="color-swatch" id="token-low-hover-dark-60"></div>
+                        <div class="color-info">
+                            <span class="color-label">custom/custom60</span>
+                            <span class="color-hex" id="token-hex-low-hover-dark-60">#000000</span>
+                        </div>
+                    </div>
+                    <div class="token-color" data-increment="25">
+                        <div class="color-swatch" id="token-low-hover-hc-25"></div>
+                        <div class="color-info">
+                            <span class="color-label">custom/custom25</span>
+                            <span class="color-hex" id="token-hex-low-hover-hc-25">#000000</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="token-row">
+                    <div class="token-name">
+                        <span class="token-icon">🎯</span>
+                        <span>interactiveHighContrast</span>
+                    </div>
+                    <div class="token-color" data-increment="70">
+                        <div class="color-swatch" id="token-light-70"></div>
+                        <div class="color-info">
+                            <span class="color-label">custom/custom70</span>
+                            <span class="color-hex" id="token-hex-light-70">#000000</span>
+                        </div>
+                    </div>
+                    <div class="token-color" data-increment="10">
+                        <div class="color-swatch" id="token-dark-10"></div>
+                        <div class="color-info">
+                            <span class="color-label">custom/custom10</span>
+                            <span class="color-hex" id="token-hex-dark-10">#000000</span>
+                        </div>
+                    </div>
+                    <div class="token-color" data-increment="80">
+                        <div class="color-swatch" id="token-hc-80"></div>
+                        <div class="color-info">
+                            <span class="color-label">custom/custom80</span>
+                            <span class="color-hex" id="token-hex-hc-80">#000000</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="token-row">
+                    <div class="token-name">
+                        <span class="token-icon">🎯</span>
+                        <span>interactiveHighContrastHover</span>
+                    </div>
+                    <div class="token-color" data-increment="80">
+                        <div class="color-swatch" id="token-high-hover-light-80"></div>
+                        <div class="color-info">
+                            <span class="color-label">custom/custom80</span>
+                            <span class="color-hex" id="token-hex-high-hover-light-80">#000000</span>
+                        </div>
+                    </div>
+                    <div class="token-color" data-increment="20">
+                        <div class="color-swatch" id="token-high-hover-dark-20"></div>
+                        <div class="color-info">
+                            <span class="color-label">custom/custom20</span>
+                            <span class="color-hex" id="token-hex-high-hover-dark-20">#000000</span>
+                        </div>
+                    </div>
+                    <div class="token-color" data-increment="90">
+                        <div class="color-swatch" id="token-high-hover-hc-90"></div>
+                        <div class="color-info">
+                            <span class="color-label">custom/custom90</span>
+                            <span class="color-hex" id="token-hex-high-hover-hc-90">#000000</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="token-row">
+                    <div class="token-name">
+                        <span class="token-icon">🏠</span>
+                        <span>backgroundPrimary</span>
+                    </div>
+                    <div class="token-color" data-increment="none">
+                        <div class="color-swatch" style="background-color: #ffffff; border: 1px solid #e1e5e9;"></div>
+                        <div class="color-info">
+                            <span class="color-label">black & white/white</span>
+                        </div>
+                    </div>
+                    <div class="token-color" data-increment="90">
+                        <div class="color-swatch" id="token-bg-dark-90"></div>
+                        <div class="color-info">
+                            <span class="color-label">custom/custom90</span>
+                            <span class="color-hex" id="token-hex-bg-dark-90">#000000</span>
+                        </div>
+                    </div>
+                    <div class="token-color" data-increment="none">
+                        <div class="color-swatch" style="background-color: #ffffff; border: 1px solid #e1e5e9;"></div>
+                        <div class="color-info">
+                            <span class="color-label">black & white/white</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="token-row">
+                    <div class="token-name">
+                        <span class="token-icon">🏠</span>
+                        <span>backgroundSecondary</span>
+                    </div>
+                    <div class="token-color" data-increment="05">
+                        <div class="color-swatch" id="token-bg-light-05"></div>
+                        <div class="color-info">
+                            <span class="color-label">custom/custom05</span>
+                            <span class="color-hex" id="token-hex-bg-light-05">#000000</span>
+                        </div>
+                    </div>
+                    <div class="token-color" data-increment="none">
+                        <div class="color-swatch" style="background-color: #000000;"></div>
+                        <div class="color-info">
+                            <span class="color-label">black & white/black</span>
+                        </div>
+                    </div>
+                    <div class="token-color" data-increment="10">
+                        <div class="color-swatch" id="token-bg-hc-10"></div>
+                        <div class="color-info">
+                            <span class="color-label">custom/custom10</span>
+                            <span class="color-hex" id="token-hex-bg-hc-10">#000000</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="token-row">
+                    <div class="token-name">
+                        <span class="token-icon">🏠</span>
+                        <span>backgroundTertiary</span>
+                    </div>
+                    <div class="token-color" data-increment="10">
+                        <div class="color-swatch" id="token-bg-tertiary-light-10"></div>
+                        <div class="color-info">
+                            <span class="color-label">custom/custom10</span>
+                            <span class="color-hex" id="token-hex-bg-tertiary-light-10">#000000</span>
+                        </div>
+                    </div>
+                    <div class="token-color" data-increment="70">
+                        <div class="color-swatch" id="token-bg-tertiary-dark-70"></div>
+                        <div class="color-info">
+                            <span class="color-label">custom/custom70</span>
+                            <span class="color-hex" id="token-hex-bg-tertiary-dark-70">#000000</span>
+                        </div>
+                    </div>
+                    <div class="token-color" data-increment="20">
+                        <div class="color-swatch" id="token-bg-tertiary-hc-20"></div>
+                        <div class="color-info">
+                            <span class="color-label">custom/custom20</span>
+                            <span class="color-hex" id="token-hex-bg-tertiary-hc-20">#000000</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="token-row">
+                    <div class="token-name">
+                        <span class="token-icon">🏠</span>
+                        <span>backgroundInvertedPrimary</span>
+                    </div>
+                    <div class="token-color" data-increment="90">
+                        <div class="color-swatch" id="token-bg-inv-primary-light-90"></div>
+                        <div class="color-info">
+                            <span class="color-label">custom/custom90</span>
+                            <span class="color-hex" id="token-hex-bg-inv-primary-light-90">#000000</span>
+                        </div>
+                    </div>
+                    <div class="token-color" data-increment="none">
+                        <div class="color-swatch" style="background-color: #ffffff; border: 1px solid #e1e5e9;"></div>
+                        <div class="color-info">
+                            <span class="color-label">black & white/white</span>
+                        </div>
+                    </div>
+                    <div class="token-color" data-increment="80">
+                        <div class="color-swatch" id="token-bg-inv-primary-hc-80"></div>
+                        <div class="color-info">
+                            <span class="color-label">custom/custom80</span>
+                            <span class="color-hex" id="token-hex-bg-inv-primary-hc-80">#000000</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="token-row">
+                    <div class="token-name">
+                        <span class="token-icon">🏠</span>
+                        <span>backgroundInvertedSecondary</span>
+                    </div>
+                    <div class="token-color" data-increment="none">
+                        <div class="color-swatch" style="background-color: #000000;"></div>
+                        <div class="color-info">
+                            <span class="color-label">black & white/black</span>
+                        </div>
+                    </div>
+                    <div class="token-color" data-increment="05">
+                        <div class="color-swatch" id="token-bg-inv-secondary-dark-05"></div>
+                        <div class="color-info">
+                            <span class="color-label">custom/custom05</span>
+                            <span class="color-hex" id="token-hex-bg-inv-secondary-dark-05">#000000</span>
+                        </div>
+                    </div>
+                    <div class="token-color" data-increment="none">
+                        <div class="color-swatch" style="background-color: #000000;"></div>
+                        <div class="color-info">
+                            <span class="color-label">black & white/black</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="token-row">
+                    <div class="token-name">
+                        <span class="token-icon">🏠</span>
+                        <span>backgroundInvertedTertiary</span>
+                    </div>
+                    <div class="token-color" data-increment="70">
+                        <div class="color-swatch" id="token-bg-inv-tertiary-light-70"></div>
+                        <div class="color-info">
+                            <span class="color-label">custom/custom70</span>
+                            <span class="color-hex" id="token-hex-bg-inv-tertiary-light-70">#000000</span>
+                        </div>
+                    </div>
+                    <div class="token-color" data-increment="10">
+                        <div class="color-swatch" id="token-bg-inv-tertiary-dark-10"></div>
+                        <div class="color-info">
+                            <span class="color-label">custom/custom10</span>
+                            <span class="color-hex" id="token-hex-bg-inv-tertiary-dark-10">#000000</span>
+                        </div>
+                    </div>
+                    <div class="token-color" data-increment="70">
+                        <div class="color-swatch" id="token-bg-inv-tertiary-hc-70"></div>
+                        <div class="color-info">
+                            <span class="color-label">custom/custom70</span>
+                            <span class="color-hex" id="token-hex-bg-inv-tertiary-hc-70">#000000</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="token-row">
+                    <div class="token-name">
+                        <span class="token-icon">📝</span>
+                        <span>contentPrimary</span>
+                    </div>
+                    <div class="token-color" data-increment="90">
+                        <div class="color-swatch" id="token-content-primary-light-90"></div>
+                        <div class="color-info">
+                            <span class="color-label">custom/custom90</span>
+                            <span class="color-hex" id="token-hex-content-primary-light-90">#000000</span>
+                        </div>
+                    </div>
+                    <div class="token-color" data-increment="none">
+                        <div class="color-swatch" style="background-color: #ffffff; border: 1px solid #e1e5e9;"></div>
+                        <div class="color-info">
+                            <span class="color-label">black & white/white</span>
+                        </div>
+                    </div>
+                    <div class="token-color" data-increment="none">
+                        <div class="color-swatch" style="background-color: #000000;"></div>
+                        <div class="color-info">
+                            <span class="color-label">black & white/black</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="token-row">
+                    <div class="token-name">
+                        <span class="token-icon">📝</span>
+                        <span>contentSecondary</span>
+                    </div>
+                    <div class="token-color" data-increment="55">
+                        <div class="color-swatch" id="token-content-secondary-light-55"></div>
+                        <div class="color-info">
+                            <span class="color-label">custom/custom55</span>
+                            <span class="color-hex" id="token-hex-content-secondary-light-55">#000000</span>
+                        </div>
+                    </div>
+                    <div class="token-color" data-increment="30">
+                        <div class="color-swatch" id="token-content-secondary-dark-30"></div>
+                        <div class="color-info">
+                            <span class="color-label">custom/custom30</span>
+                            <span class="color-hex" id="token-hex-content-secondary-dark-30">#000000</span>
+                        </div>
+                    </div>
+                    <div class="token-color" data-increment="80">
+                        <div class="color-swatch" id="token-content-secondary-hc-80"></div>
+                        <div class="color-info">
+                            <span class="color-label">custom/custom80</span>
+                            <span class="color-hex" id="token-hex-content-secondary-hc-80">#000000</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="token-row">
+                    <div class="token-name">
+                        <span class="token-icon">📝</span>
+                        <span>contentTertiary</span>
+                    </div>
+                    <div class="token-color" data-increment="50">
+                        <div class="color-swatch" id="token-content-tertiary-light-50"></div>
+                        <div class="color-info">
+                            <span class="color-label">custom/custom50</span>
+                            <span class="color-hex" id="token-hex-content-tertiary-light-50">#000000</span>
+                        </div>
+                    </div>
+                    <div class="token-color" data-increment="40">
+                        <div class="color-swatch" id="token-content-tertiary-dark-40"></div>
+                        <div class="color-info">
+                            <span class="color-label">custom/custom40</span>
+                            <span class="color-hex" id="token-hex-content-tertiary-dark-40">#000000</span>
+                        </div>
+                    </div>
+                    <div class="token-color" data-increment="60">
+                        <div class="color-swatch" id="token-content-tertiary-hc-60"></div>
+                        <div class="color-info">
+                            <span class="color-label">custom/custom60</span>
+                            <span class="color-hex" id="token-hex-content-tertiary-hc-60">#000000</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="token-row">
+                    <div class="token-name">
+                        <span class="token-icon">📝</span>
+                        <span>contentInvertedPrimary</span>
+                    </div>
+                    <div class="token-color" data-increment="none">
+                        <div class="color-swatch" style="background-color: #ffffff; border: 1px solid #e1e5e9;"></div>
+                        <div class="color-info">
+                            <span class="color-label">black & white/white</span>
+                        </div>
+                    </div>
+                    <div class="token-color" data-increment="90">
+                        <div class="color-swatch" id="token-content-inv-primary-dark-90"></div>
+                        <div class="color-info">
+                            <span class="color-label">custom/custom90</span>
+                            <span class="color-hex" id="token-hex-content-inv-primary-dark-90">#000000</span>
+                        </div>
+                    </div>
+                    <div class="token-color" data-increment="none">
+                        <div class="color-swatch" style="background-color: #ffffff; border: 1px solid #e1e5e9;"></div>
+                        <div class="color-info">
+                            <span class="color-label">black & white/white</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="token-row">
+                    <div class="token-name">
+                        <span class="token-icon">📝</span>
+                        <span>contentInvertedSecondary</span>
+                    </div>
+                    <div class="token-color" data-increment="40">
+                        <div class="color-swatch" id="token-content-inv-secondary-light-40"></div>
+                        <div class="color-info">
+                            <span class="color-label">custom/custom40</span>
+                            <span class="color-hex" id="token-hex-content-inv-secondary-light-40">#000000</span>
+                        </div>
+                    </div>
+                    <div class="token-color" data-increment="60">
+                        <div class="color-swatch" id="token-content-inv-secondary-dark-60"></div>
+                        <div class="color-info">
+                            <span class="color-label">custom/custom60</span>
+                            <span class="color-hex" id="token-hex-content-inv-secondary-dark-60">#000000</span>
+                        </div>
+                    </div>
+                    <div class="token-color" data-increment="10">
+                        <div class="color-swatch" id="token-content-inv-secondary-hc-10"></div>
+                        <div class="color-info">
+                            <span class="color-label">custom/custom10</span>
+                            <span class="color-hex" id="token-hex-content-inv-secondary-hc-10">#000000</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="token-row">
+                    <div class="token-name">
+                        <span class="token-icon">📝</span>
+                        <span>contentInvertedTertiary</span>
+                    </div>
+                    <div class="token-color" data-increment="60">
+                        <div class="color-swatch" id="token-content-inv-tertiary-light-60"></div>
+                        <div class="color-info">
+                            <span class="color-label">custom/custom60</span>
+                            <span class="color-hex" id="token-hex-content-inv-tertiary-light-60">#000000</span>
+                        </div>
+                    </div>
+                    <div class="token-color" data-increment="50">
+                        <div class="color-swatch" id="token-content-inv-tertiary-dark-50"></div>
+                        <div class="color-info">
+                            <span class="color-label">custom/custom50</span>
+                            <span class="color-hex" id="token-hex-content-inv-tertiary-dark-50">#000000</span>
+                        </div>
+                    </div>
+                    <div class="token-color" data-increment="30">
+                        <div class="color-swatch" id="token-content-inv-tertiary-hc-30"></div>
+                        <div class="color-info">
+                            <span class="color-label">custom/custom30</span>
+                            <span class="color-hex" id="token-hex-content-inv-tertiary-hc-30">#000000</span>
+                        </div>
+                    </div>
+                </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class ThemeCustomizer {
+            constructor() {
+                this.colorGradient = document.getElementById('colorGradient');
+                this.colorHandle = document.getElementById('colorHandle');
+                this.hexInput = document.getElementById('hexInput');
+                this.resetBtn = document.getElementById('resetBtn');
+                this.colorScale = document.getElementById('colorScale');
+                
+                // Hue controls
+                this.bottomHue = document.getElementById('bottomHue');
+                this.middleHue = document.getElementById('middleHue');
+                this.topHue = document.getElementById('topHue');
+                this.bottomHueValue = document.getElementById('bottomHueValue');
+                this.middleHueValue = document.getElementById('middleHueValue');
+                this.topHueValue = document.getElementById('topHueValue');
+                
+                // Saturation controls
+                this.bottomSaturation = document.getElementById('bottomSaturation');
+                this.middleSaturation = document.getElementById('middleSaturation');
+                this.topSaturation = document.getElementById('topSaturation');
+                this.bottomSaturationValue = document.getElementById('bottomSaturationValue');
+                this.middleSaturationValue = document.getElementById('middleSaturationValue');
+                this.topSaturationValue = document.getElementById('topSaturationValue');
+                
+                this.isDragging = false;
+                this.currentColor = '#0062FF';
+                this.defaultColor = '#0062FF';
+                
+                this.init();
+            }
+            
+            init() {
+                // Set initial handle position
+                const position = this.findPositionForColor(this.currentColor);
+                this.setHandlePosition(position);
+                
+                // Generate initial palette and themes
+                const palette = this.generatePalette(this.currentColor);
+                this.updateThemes(this.currentColor);
+                
+                // Delay the color scale update to ensure DOM is ready
+                setTimeout(() => {
+                    this.updateColorScale(this.currentColor);
+                    this.updateTokenTable(this.currentColor);
+                }, 100);
+                
+                // Event listeners
+                this.colorGradient.addEventListener('click', this.handleGradientClick.bind(this));
+                this.colorHandle.addEventListener('mousedown', this.handleMouseDown.bind(this));
+                document.addEventListener('mousemove', this.handleMouseMove.bind(this));
+                document.addEventListener('mouseup', this.handleMouseUp.bind(this));
+                
+                this.hexInput.addEventListener('input', this.handleHexInput.bind(this));
+                this.resetBtn.addEventListener('click', this.resetToDefault.bind(this));
+                
+                // Hue control event listeners
+                this.bottomHue.addEventListener('input', this.handleHueChange.bind(this));
+                this.middleHue.addEventListener('input', this.handleHueChange.bind(this));
+                this.topHue.addEventListener('input', this.handleHueChange.bind(this));
+                
+                // Saturation control event listeners
+                this.bottomSaturation.addEventListener('input', this.handleSaturationChange.bind(this));
+                this.middleSaturation.addEventListener('input', this.handleSaturationChange.bind(this));
+                this.topSaturation.addEventListener('input', this.handleSaturationChange.bind(this));
+                
+                // Toggle functionality
+                document.getElementById('uiPreviewTab').addEventListener('click', this.showUIPreview.bind(this));
+                document.getElementById('hexCodesTab').addEventListener('click', this.showHexCodes.bind(this));
+                
+                // Export functionality
+                document.getElementById('exportButton').addEventListener('click', this.exportTokens.bind(this));
+            }
+            
+            showUIPreview() {
+                document.getElementById('uiPreviewContent').classList.add('active');
+                document.getElementById('hexCodesContent').classList.remove('active');
+                document.getElementById('uiPreviewTab').classList.add('active');
+                document.getElementById('hexCodesTab').classList.remove('active');
+                document.getElementById('exportButton').classList.remove('show');
+            }
+            
+            showHexCodes() {
+                document.getElementById('hexCodesContent').classList.add('active');
+                document.getElementById('uiPreviewContent').classList.remove('active');
+                document.getElementById('hexCodesTab').classList.add('active');
+                document.getElementById('uiPreviewTab').classList.remove('active');
+                document.getElementById('exportButton').classList.add('show');
+            }
+            
+            handleGradientClick(e) {
+                const rect = this.colorGradient.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const percentage = Math.max(0, Math.min(100, (x / rect.width) * 100));
+                
+                this.setHandlePosition(percentage);
+                this.updateColorFromPosition(percentage);
+            }
+            
+            handleMouseDown(e) {
+                this.isDragging = true;
+                this.colorHandle.style.cursor = 'grabbing';
+                e.preventDefault();
+            }
+            
+            handleMouseMove(e) {
+                if (!this.isDragging) return;
+                
+                const rect = this.colorGradient.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const percentage = Math.max(0, Math.min(100, (x / rect.width) * 100));
+                
+                this.setHandlePosition(percentage);
+                this.updateColorFromPosition(percentage);
+            }
+            
+            handleMouseUp() {
+                this.isDragging = false;
+                this.colorHandle.style.cursor = 'grab';
+            }
+            
+            setHandlePosition(percentage) {
+                this.colorHandle.style.left = percentage + '%';
+            }
+            
+            updateColorFromPosition(percentage) {
+                const hue = (percentage / 100) * 360;
+                const color = chroma.hsl(hue, 1, 0.5).hex();
+                
+                this.currentColor = color;
+                this.hexInput.value = color;
+                
+                // Update themes
+                const palette = this.generatePalette(color);
+                this.updateThemes(color);
+                this.toggleResetButton();
+                
+                // Update color scale
+                this.updateColorScale(color);
+                
+                // Update token mapping table
+                this.updateTokenTable(color);
+            }
+            
+            handleHueChange(e) {
+                const value = parseInt(e.target.value);
+                
+                // Update the displayed value
+                if (e.target.id === 'bottomHue') {
+                    this.bottomHueValue.textContent = value + '°';
+                } else if (e.target.id === 'middleHue') {
+                    this.middleHueValue.textContent = value + '°';
+                } else if (e.target.id === 'topHue') {
+                    this.topHueValue.textContent = value + '°';
+                }
+                
+                // Regenerate the color scale with new hue values
+                this.updateColorScale(this.currentColor);
+                
+                // Update token mapping table
+                this.updateTokenTable(this.currentColor);
+                
+                // Update UI theme previews with new colors
+                this.updateThemes(this.currentColor);
+            }
+            
+            handleSaturationChange(e) {
+                const value = parseInt(e.target.value);
+                
+                // Update the displayed value
+                if (e.target.id === 'bottomSaturation') {
+                    this.bottomSaturationValue.textContent = value + '%';
+                } else if (e.target.id === 'middleSaturation') {
+                    this.middleSaturationValue.textContent = value + '%';
+                } else if (e.target.id === 'topSaturation') {
+                    this.topSaturationValue.textContent = value + '%';
+                }
+                
+                // Regenerate the color scale with new saturation values
+                this.updateColorScale(this.currentColor);
+                
+                // Update token mapping table
+                this.updateTokenTable(this.currentColor);
+                
+                // Update UI theme previews with new colors
+                this.updateThemes(this.currentColor);
+            }
+            
+            handleHexInput(e) {
+                let value = e.target.value.trim();
+                
+                // Add # if missing
+                if (value && !value.startsWith('#')) {
+                    value = '#' + value;
+                    e.target.value = value;
+                }
+                
+                // Validate hex color
+                if (chroma.valid(value)) {
+                    this.currentColor = value;
+                    
+                    // Update handle position
+                    const position = this.findPositionForColor(value);
+                    this.setHandlePosition(position);
+                    
+                    // Update themes
+                    const palette = this.generatePalette(value);
+                    this.updateThemes(value);
+                    this.updateColorScale(value);
+                    this.updateTokenTable(value);
+                    this.toggleResetButton();
+                }
+            }
+            
+            findPositionForColor(targetColor) {
+                try {
+                    const targetHue = chroma(targetColor).get('hsl.h') || 0;
+                    return (targetHue / 360) * 100;
+                } catch (e) {
+                    return 50; // Default position if color is invalid
+                }
+            }
+            
+            resetToDefault() {
+                this.currentColor = this.defaultColor;
+                this.hexInput.value = this.defaultColor;
+                
+                const position = this.findPositionForColor(this.defaultColor);
+                this.setHandlePosition(position);
+                
+                const palette = this.generatePalette(this.defaultColor);
+                this.updateThemes(this.defaultColor);
+                this.updateColorScale(this.defaultColor);
+                this.updateTokenTable(this.defaultColor);
+                this.resetBtn.classList.remove('show');
+            }
+            
+            toggleResetButton() {
+                if (this.currentColor.toLowerCase() !== this.defaultColor.toLowerCase()) {
+                    this.resetBtn.classList.add('show');
+                } else {
+                    this.resetBtn.classList.remove('show');
+                }
+            }
+            
+            generatePalette(baseColor) {
+                // Simple palette generation - can be enhanced later
+                const color = chroma(baseColor);
+                
+                return {
+                    light: {
+                        accentPrimary: baseColor,
+                        accentLowContrast: color.brighten(2).hex(),
+                        backgroundPrimary: '#ffffff',
+                        backgroundSecondary: '#f8f9fa',
+                        contentPrimary: '#212529',
+                        contentSecondary: '#6c757d'
+                    },
+                    dark: {
+                        accentPrimary: color.brighten(0.5).hex(),
+                        accentLowContrast: color.darken(1).hex(),
+                        backgroundPrimary: '#212529',
+                        backgroundSecondary: '#343a40',
+                        contentPrimary: '#ffffff',
+                        contentSecondary: '#adb5bd'
+                    }
+                };
+            }
+            
+            updateThemes(color) {
+                const palette = this.generatePalette(color);
+                
+                // Helper function to convert hex to rgb
+                const hexToRgb = (hex) => {
+                    const r = parseInt(hex.slice(1, 3), 16);
+                    const g = parseInt(hex.slice(3, 5), 16);
+                    const b = parseInt(hex.slice(5, 7), 16);
+                    return `${r}, ${g}, ${b}`;
+                };
+                
+                // Generate accent colors using proper scale increments
+                const lightAccentLowContrast = this.generateColorForContrast(color, 1.28, 10); // custom10
+                const lightAccentHighContrast = this.generateColorForContrast(color, 10.86, 70); // custom70
+                
+                // Generate hover state colors for light theme
+                const lightAccentPrimaryHover = this.generateColorForContrast(color, 6.19, 55); // custom55
+                const lightAccentLowContrastHover = this.generateColorForContrast(color, 1.55, 20); // custom20
+                const lightAccentTertiaryHover = this.generateColorForContrast(color, 1.09, 5); // custom05
+                
+                // Generate backgroundSecondary color (custom05 for light theme)
+                const lightBgSecondary = this.generateColorForContrast(color, 1.09, 5); // custom05
+                
+                // Generate backgroundTertiary color (custom10 for light theme)
+                const lightBgTertiary = this.generateColorForContrast(color, 1.28, 10); // custom10
+                
+                // Generate interactivePrimary color (custom50 for light theme)
+                const lightAccentPrimary = this.generateColorForContrast(color, 4.95, 50); // custom50
+                
+                // Generate contentInvertedPrimary color (white for light theme)
+                const lightContentInvertedPrimary = '#ffffff';
+                
+                // Update light theme CSS variables
+                const lightTheme = document.getElementById('lightTheme');
+                lightTheme.style.setProperty('--accent-primary', lightAccentPrimary.hex());
+                lightTheme.style.setProperty('--accent-primary-rgb', hexToRgb(lightAccentPrimary.hex()));
+                lightTheme.style.setProperty('--accent-primary-hover', lightAccentPrimaryHover.hex());
+                lightTheme.style.setProperty('--accent-low-contrast', lightAccentLowContrast.hex());
+                lightTheme.style.setProperty('--accent-low-contrast-hover', lightAccentLowContrastHover.hex());
+                lightTheme.style.setProperty('--accent-high-contrast', lightAccentHighContrast.hex());
+                lightTheme.style.setProperty('--accent-tertiary-hover', lightAccentTertiaryHover.hex());
+                lightTheme.style.setProperty('--bg-primary', palette.light.backgroundPrimary);
+                lightTheme.style.setProperty('--bg-secondary', lightBgSecondary.hex());
+                lightTheme.style.setProperty('--bg-tertiary', lightBgTertiary.hex());
+                lightTheme.style.setProperty('--content-primary', palette.light.contentPrimary);
+                lightTheme.style.setProperty('--content-secondary', palette.light.contentSecondary);
+                lightTheme.style.setProperty('--content-inverted-primary', lightContentInvertedPrimary);
+                
+                // Generate accent colors using proper scale increments
+                const darkAccentLowContrast = this.generateColorForContrast(color, 10.86, 70); // custom70
+                const darkAccentHighContrast = this.generateColorForContrast(color, 1.28, 10); // custom10
+                
+                // Generate hover state colors for dark theme
+                const darkAccentPrimaryHover = this.generateColorForContrast(color, 1.86, 25); // custom25
+                const darkAccentLowContrastHover = this.generateColorForContrast(color, 7.57, 60); // custom60
+                const darkAccentTertiaryHover = this.generateColorForContrast(color, 1.09, 5); // custom05
+                
+                // Generate backgroundTertiary color (custom70 for dark theme)
+                const darkBgTertiary = this.generateColorForContrast(color, 10.86, 70); // custom70
+                
+                // Generate interactivePrimary color (custom30 for dark theme)
+                const darkAccentPrimary = this.generateColorForContrast(color, 2.25, 30); // custom30
+                
+                // Generate contentInvertedPrimary color (custom90 for dark theme)
+                const darkContentInvertedPrimary = this.generateColorForContrast(color, 15.9, 90); // custom90
+                
+                // Update dark theme CSS variables
+                const darkTheme = document.getElementById('darkTheme');
+                darkTheme.style.setProperty('--accent-primary', darkAccentPrimary.hex());
+                darkTheme.style.setProperty('--accent-primary-rgb', hexToRgb(darkAccentPrimary.hex()));
+                darkTheme.style.setProperty('--accent-primary-hover', darkAccentPrimaryHover.hex());
+                darkTheme.style.setProperty('--accent-low-contrast', darkAccentLowContrast.hex());
+                darkTheme.style.setProperty('--accent-low-contrast-hover', darkAccentLowContrastHover.hex());
+                darkTheme.style.setProperty('--accent-high-contrast', darkAccentHighContrast.hex());
+                darkTheme.style.setProperty('--accent-tertiary-hover', darkAccentTertiaryHover.hex());
+                darkTheme.style.setProperty('--bg-primary', palette.dark.backgroundPrimary);
+                darkTheme.style.setProperty('--bg-secondary', palette.dark.backgroundSecondary);
+                darkTheme.style.setProperty('--bg-tertiary', darkBgTertiary.hex());
+                darkTheme.style.setProperty('--content-primary', palette.dark.contentPrimary);
+                darkTheme.style.setProperty('--content-secondary', palette.dark.contentSecondary);
+                darkTheme.style.setProperty('--content-inverted-primary', darkContentInvertedPrimary.hex());
+            }
+            
+            generateColorForContrast(baseColor, targetContrast, increment) {
+                const whiteBackground = chroma('#ffffff');
+                const baseChroma = chroma(baseColor);
+                const [h, s] = baseChroma.hsl();
+                
+                // Get hue and saturation adjustments for this increment
+                const { adjustedHue, adjustedSaturation } = this.getHueSaturationForIncrement(increment, h, s);
+                
+                // Binary search for the right lightness to achieve target contrast
+                let minLightness = 0;
+                let maxLightness = 1;
+                let targetLightness = increment <= 50 ? 0.95 - (increment / 100) * 0.9 : 0.05 + ((100 - increment) / 100) * 0.9;
+                
+                const tolerance = 0.05;
+                let iterations = 0;
+                
+                let color = chroma.hsl(adjustedHue, adjustedSaturation, targetLightness);
+                let currentContrast = chroma.contrast(color, whiteBackground);
+                
+                while (Math.abs(currentContrast - targetContrast) > tolerance && iterations < 50) {
+                    if (currentContrast < targetContrast) {
+                        maxLightness = targetLightness;
+                        targetLightness = (minLightness + targetLightness) / 2;
+                    } else {
+                        minLightness = targetLightness;
+                        targetLightness = (targetLightness + maxLightness) / 2;
+                    }
+                    color = chroma.hsl(adjustedHue, adjustedSaturation, targetLightness);
+                    currentContrast = chroma.contrast(color, whiteBackground);
+                    iterations++;
+                }
+                
+                return color;
+            }
+            
+            getHueSaturationForIncrement(increment, baseHue, baseSaturation) {
+                // Get control values
+                const bottomHue = parseInt(this.bottomHue.value);
+                const middleHue = parseInt(this.middleHue.value);
+                const topHue = parseInt(this.topHue.value);
+                
+                const bottomSat = parseInt(this.bottomSaturation.value) / 100;
+                const middleSat = parseInt(this.middleSaturation.value) / 100;
+                const topSat = parseInt(this.topSaturation.value) / 100;
+                
+                // Interpolate hue
+                let adjustedHue = baseHue || 0;
+                if (increment <= 5) {
+                    adjustedHue = this.interpolateHue(adjustedHue, adjustedHue + bottomHue, increment / 5);
+                } else if (increment <= 50) {
+                    adjustedHue = this.interpolateHue(adjustedHue + bottomHue, adjustedHue + middleHue, (increment - 5) / 45);
+                } else {
+                    adjustedHue = this.interpolateHue(adjustedHue + middleHue, adjustedHue + topHue, (increment - 50) / 45);
+                }
+                
+                // Interpolate saturation
+                let adjustedSaturation = baseSaturation || 1;
+                if (increment <= 5) {
+                    // For increments 0-5, interpolate from base saturation to bottom saturation
+                    adjustedSaturation = adjustedSaturation + (bottomSat - adjustedSaturation) * (increment / 5);
+                } else if (increment <= 50) {
+                    adjustedSaturation = bottomSat + (middleSat - bottomSat) * ((increment - 5) / 45);
+                } else {
+                    adjustedSaturation = middleSat + (topSat - middleSat) * ((increment - 50) / 45);
+                }
+                
+                return { adjustedHue, adjustedSaturation };
+            }
+            
+            interpolateHue(hue1, hue2, position) {
+                hue1 = ((hue1 % 360) + 360) % 360;
+                hue2 = ((hue2 % 360) + 360) % 360;
+                let diff = hue2 - hue1;
+                if (diff > 180) diff -= 360;
+                else if (diff < -180) diff += 360;
+                return hue1 + diff * position;
+            }
+            
+            updateColorScale(color) {
+                const colorScale = document.getElementById('colorScale');
+                if (!colorScale) return;
+                
+                // Clear existing content
+                colorScale.innerHTML = '';
+                
+                // Define increments and their target contrast ratios
+                const increments = [5, 10, 20, 25, 30, 40, 50, 55, 60, 70, 80, 90, 95];
+                const targetContrasts = {
+                    5: 1.09, 10: 1.28, 20: 1.55, 25: 1.86, 30: 2.25,
+                    40: 3.36, 50: 4.95, 55: 6.19, 60: 7.57, 70: 10.86,
+                    80: 13.19, 90: 15.9, 95: 17.92
+                };
+                
+                increments.forEach(increment => {
+                    const targetContrast = targetContrasts[increment];
+                    const scaleColor = this.generateColorForContrast(color, targetContrast, increment);
+                    
+                    const scaleIncrement = document.createElement('div');
+                    scaleIncrement.className = 'scale-increment';
+                    scaleIncrement.style.backgroundColor = scaleColor.hex();
+                    
+                    // Determine text color based on lightness
+                    const textColor = scaleColor.get('hsl.l') > 0.5 ? '#000000' : '#ffffff';
+                    scaleIncrement.style.color = textColor;
+                    
+                    // Set the label text
+                    scaleIncrement.textContent = increment.toString().padStart(2, '0');
+                    
+                    colorScale.appendChild(scaleIncrement);
+                });
+            }
+            
+            updateTokenTable(baseColor) {
+                // Define target contrast ratios for each increment
+                const targetContrasts = {
+                    5: 1.09, 10: 1.28, 20: 1.55, 25: 1.86, 30: 2.25,
+                    40: 3.36, 50: 4.95, 55: 6.19, 60: 7.57, 70: 10.86,
+                    80: 13.19, 90: 15.9, 95: 17.92
+                };
+                
+                // Also create mappings for string versions
+                const targetContrastsStr = {
+                    '05': 1.09, '10': 1.28, '20': 1.55, '25': 1.86, '30': 2.25,
+                    '40': 3.36, '50': 4.95, '55': 6.19, '60': 7.57, '70': 10.86,
+                    '80': 13.19, '90': 15.9, '95': 17.92
+                };
+                
+                // Generate colors for each increment (both numeric and string versions)
+                const scaleColors = {};
+                Object.keys(targetContrasts).forEach(increment => {
+                    const targetContrast = targetContrasts[increment];
+                    const color = this.generateColorForContrast(baseColor, targetContrast, parseInt(increment));
+                    scaleColors[increment] = color.hex();
+                });
+                
+                Object.keys(targetContrastsStr).forEach(increment => {
+                    const targetContrast = targetContrastsStr[increment];
+                    const color = this.generateColorForContrast(baseColor, targetContrast, parseInt(increment));
+                    scaleColors[increment] = color.hex();
+                });
+                
+                // Update each color swatch and hex value in the token table
+                const tokenSwatches = document.querySelectorAll('.token-color .color-swatch');
+                tokenSwatches.forEach(swatch => {
+                    const tokenColor = swatch.closest('.token-color');
+                    const increment = tokenColor.getAttribute('data-increment');
+                    
+                    if (scaleColors[increment]) {
+                        swatch.style.backgroundColor = scaleColors[increment];
+                        
+                        // Update the hex value for this swatch
+                        const hexElement = tokenColor.querySelector('.color-hex');
+                        if (hexElement) {
+                            hexElement.textContent = scaleColors[increment].toUpperCase();
+                        }
+                    }
+                });
+            }
+            
+            exportTokens() {
+                // Define target contrast ratios for each increment
+                const targetContrasts = {
+                    5: 1.09, 10: 1.28, 20: 1.55, 25: 1.86, 30: 2.25,
+                    40: 3.36, 50: 4.95, 55: 6.19, 60: 7.57, 70: 10.86,
+                    80: 13.19, 90: 15.9, 95: 17.92
+                };
+                
+                // Generate all colors for current base color
+                const scaleColors = {};
+                Object.keys(targetContrasts).forEach(increment => {
+                    const targetContrast = targetContrasts[increment];
+                    const color = this.generateColorForContrast(this.currentColor, targetContrast, parseInt(increment));
+                    scaleColors[`custom${increment.toString().padStart(2, '0')}`] = color.hex();
+                });
+                
+                // Create the token structure matching the table
+                const tokens = {
+                    interactivePrimary: {
+                        lightMode: scaleColors.custom50,
+                        darkMode: scaleColors.custom30,
+                        lightModeHighContrast: scaleColors.custom60
+                    },
+                    interactivePrimaryHover: {
+                        lightMode: scaleColors.custom55,
+                        darkMode: scaleColors.custom25,
+                        lightModeHighContrast: scaleColors.custom70
+                    },
+                    interactiveLowContrast: {
+                        lightMode: scaleColors.custom10,
+                        darkMode: scaleColors.custom70,
+                        lightModeHighContrast: scaleColors.custom20
+                    },
+                    interactiveLowContrastHover: {
+                        lightMode: scaleColors.custom20,
+                        darkMode: scaleColors.custom60,
+                        lightModeHighContrast: scaleColors.custom25
+                    },
+                    interactiveHighContrast: {
+                        lightMode: scaleColors.custom70,
+                        darkMode: scaleColors.custom10,
+                        lightModeHighContrast: scaleColors.custom80
+                    },
+                    interactiveHighContrastHover: {
+                        lightMode: scaleColors.custom80,
+                        darkMode: scaleColors.custom20,
+                        lightModeHighContrast: scaleColors.custom90
+                    },
+                    backgroundPrimary: {
+                        lightMode: '#ffffff',
+                        darkMode: scaleColors.custom90,
+                        lightModeHighContrast: '#ffffff'
+                    },
+                    backgroundSecondary: {
+                        lightMode: scaleColors.custom05,
+                        darkMode: '#000000',
+                        lightModeHighContrast: scaleColors.custom10
+                    },
+                    backgroundTertiary: {
+                        lightMode: scaleColors.custom10,
+                        darkMode: scaleColors.custom70,
+                        lightModeHighContrast: scaleColors.custom20
+                    },
+                    contentPrimary: {
+                        lightMode: scaleColors.custom90,
+                        darkMode: '#ffffff',
+                        lightModeHighContrast: '#000000'
+                    },
+                    contentSecondary: {
+                        lightMode: scaleColors.custom55,
+                        darkMode: scaleColors.custom30,
+                        lightModeHighContrast: scaleColors.custom80
+                    },
+                    contentTertiary: {
+                        lightMode: scaleColors.custom50,
+                        darkMode: scaleColors.custom40,
+                        lightModeHighContrast: scaleColors.custom60
+                    },
+                    baseColor: this.currentColor,
+                    colorScale: scaleColors,
+                    exportedAt: new Date().toISOString()
+                };
+                
+                // Create and download JSON file
+                const dataStr = JSON.stringify(tokens, null, 2);
+                const dataBlob = new Blob([dataStr], {type: 'application/json'});
+                const url = URL.createObjectURL(dataBlob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `theme-tokens-${new Date().toISOString().slice(0,10)}.json`;
+                link.click();
+                URL.revokeObjectURL(url);
+            }
+        }
+        
+        // Initialize the theme customizer when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new ThemeCustomizer();
+        });
+    </script>
+</body>
+</html>
